@@ -1,0 +1,11 @@
+{
+  "engine_config_version": 20261031,
+  "llama_cpp_repo": "https://github.com/ggml-org/llama.cpp.git",
+  "llama_cpp_min_build": 10261,
+  "stable_diffusion_cpp_repo": "https://github.com/leejet/stable-diffusion.cpp.git",
+  "stable_diffusion_cpp_tag": "master-1028-37bc88b",
+  "acestep_cpp_repo": "https://github.com/ServeurpersoCom/acestep.cpp.git",
+  "cuda_keyring_deb_url": "https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-keyring_1.1-1_all.deb",
+  "cuda_apt_package": "cuda-toolkit-13-0",
+  "miniforge_linux_x86_64_url": "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh"
+}

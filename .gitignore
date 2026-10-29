@@ -1,0 +1,8 @@
+build/obj/
+*.o
+*.obj
+*.raw
+*.raw.exe
+*.part
+*.tmp.*
+.DS_Store

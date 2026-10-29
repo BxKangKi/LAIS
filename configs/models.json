@@ -1,0 +1,2171 @@
+{
+  "catalog_version": 2026103104,
+  "catalog_revision": 4,
+  "schema_version": 2,
+  "verified_on": "2026-10-31",
+  "hardware_profile": {
+    "vram_gib": 16,
+    "host_ram_gib": 32,
+    "priority": "Best verified, runtime-compatible local model candidates within a 16 GiB CUDA budget; no model-layer CPU offload or automatic CPU spill.",
+    "model_cpu_offload": false,
+    "automatic_cpu_spill": false,
+    "gpu_backend": "CUDA0",
+    "vram_reserve_mib": 2048,
+    "notes": [
+      "16 GiB physical VRAM; plan at most 14 GiB for the active process and reserve 2 GiB for the desktop, driver and other allocations.",
+      "Load one pipeline at a time. Release CUDA weights for previous text, vision, image, video and music pipelines before loading another.",
+      "Serialized file sizes are not peak VRAM measurements. KV/recurrent caches, attention workspaces, text encoders, projectors, VAEs, activations and allocator overhead also consume VRAM.",
+      "Runtime must apply context/resolution/frame limits, GPU-layer placement and offload policy; JSON metadata alone cannot enforce them or disable operating-system shared GPU memory.",
+      "On allocation failure, release the failed pipeline and retry Eco of the same mode; do not silently switch to aligned weights or CPU layers.",
+      "Host RAM remains necessary for downloads, file mappings, loading and operating-system caches. CPU weight inference is not intended."
+    ],
+    "max_concurrent_generation_jobs": 1,
+    "max_resident_pipelines": 1,
+    "vram_budget_mib": 14336
+  },
+  "generation_profiles": {
+    "text_standard_eco": {
+      "mode": "standard",
+      "family": "qwen35",
+      "label": "Qwen3.5 9B Q8_0",
+      "roles": {
+        "model": "llm_standard_eco"
+      },
+      "min_vram_mb": 11264,
+      "min_dram_mb": 4096,
+      "component_keys": [
+        "llm_standard_eco"
+      ],
+      "parameter_file_bytes": 9527502048,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 9087,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 5249,
+        "peak_vram_measured_mib": null
+      },
+      "context_length": 8192,
+      "parallel_sequences": 1,
+      "batch_size": 128,
+      "ubatch_size": 32,
+      "gpu_layers": "all",
+      "flash_attention": true
+    },
+    "coder_standard_eco": {
+      "mode": "standard",
+      "family": "qwen35",
+      "label": "Qwen3.5 9B Q8_0",
+      "roles": {
+        "model": "llm_standard_eco"
+      },
+      "min_vram_mb": 11264,
+      "min_dram_mb": 4096,
+      "component_keys": [
+        "llm_standard_eco"
+      ],
+      "parameter_file_bytes": 9527502048,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 9087,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 5249,
+        "peak_vram_measured_mib": null
+      },
+      "context_length": 8192,
+      "parallel_sequences": 1,
+      "batch_size": 128,
+      "ubatch_size": 32,
+      "gpu_layers": "all",
+      "flash_attention": true
+    },
+    "text_standard_high": {
+      "mode": "standard",
+      "family": "qwen35",
+      "label": "Qwen3.8 27B UD-Q3_K_XL",
+      "roles": {
+        "model": "llm_standard_high"
+      },
+      "min_vram_mb": 14336,
+      "min_dram_mb": 4096,
+      "component_keys": [
+        "llm_standard_high"
+      ],
+      "parameter_file_bytes": 13146393504,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 12538,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 1798,
+        "peak_vram_measured_mib": null
+      },
+      "context_length": 4096,
+      "parallel_sequences": 1,
+      "batch_size": 128,
+      "ubatch_size": 32,
+      "gpu_layers": "all",
+      "flash_attention": true
+    },
+    "coder_standard_high": {
+      "mode": "standard",
+      "family": "qwen35",
+      "label": "Qwen3.8 27B UD-Q3_K_XL",
+      "roles": {
+        "model": "llm_standard_high"
+      },
+      "min_vram_mb": 14336,
+      "min_dram_mb": 4096,
+      "component_keys": [
+        "llm_standard_high"
+      ],
+      "parameter_file_bytes": 13146393504,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 12538,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 1798,
+        "peak_vram_measured_mib": null
+      },
+      "context_length": 4096,
+      "parallel_sequences": 1,
+      "batch_size": 128,
+      "ubatch_size": 32,
+      "gpu_layers": "all",
+      "flash_attention": true
+    },
+    "vision_standard_eco": {
+      "mode": "standard",
+      "family": "qwen35",
+      "label": "Qwen3.5 9B Q8_0",
+      "roles": {
+        "model": "llm_standard_eco",
+        "mmproj": "vision_standard_projector"
+      },
+      "min_vram_mb": 12800,
+      "min_dram_mb": 4096,
+      "component_keys": [
+        "llm_standard_eco",
+        "vision_standard_projector"
+      ],
+      "parameter_file_bytes": 10445668128,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 9962,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 4374,
+        "peak_vram_measured_mib": null
+      },
+      "context_length": 8192,
+      "parallel_sequences": 1,
+      "batch_size": 128,
+      "ubatch_size": 32,
+      "gpu_layers": "all",
+      "flash_attention": true,
+      "max_images": 1,
+      "max_image_tokens": 1024
+    },
+    "vision_standard_high": {
+      "mode": "standard",
+      "family": "qwen35",
+      "label": "Qwen3.8 27B IQ3_S",
+      "roles": {
+        "model": "vision_standard_high",
+        "mmproj": "vision_standard_high_projector"
+      },
+      "min_vram_mb": 14336,
+      "min_dram_mb": 4096,
+      "component_keys": [
+        "vision_standard_high",
+        "vision_standard_high_projector"
+      ],
+      "parameter_file_bytes": 12968490592,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 12368,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 1968,
+        "peak_vram_measured_mib": null
+      },
+      "context_length": 4096,
+      "parallel_sequences": 1,
+      "batch_size": 128,
+      "ubatch_size": 32,
+      "gpu_layers": "all",
+      "flash_attention": true,
+      "max_images": 1,
+      "max_image_tokens": 1024
+    },
+    "text_uncensored_eco": {
+      "mode": "uncensored",
+      "family": "qwen35",
+      "label": "Qwen3.5 9B Q8_0 · uncensored",
+      "roles": {
+        "model": "llm_uncensored_eco"
+      },
+      "min_vram_mb": 11264,
+      "min_dram_mb": 4096,
+      "component_keys": [
+        "llm_uncensored_eco"
+      ],
+      "parameter_file_bytes": 9527501184,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 9087,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 5249,
+        "peak_vram_measured_mib": null
+      },
+      "context_length": 8192,
+      "parallel_sequences": 1,
+      "batch_size": 128,
+      "ubatch_size": 32,
+      "gpu_layers": "all",
+      "flash_attention": true
+    },
+    "coder_uncensored_eco": {
+      "mode": "uncensored",
+      "family": "qwen35",
+      "label": "Qwen3.5 9B Q8_0 · uncensored",
+      "roles": {
+        "model": "llm_uncensored_eco"
+      },
+      "min_vram_mb": 11264,
+      "min_dram_mb": 4096,
+      "component_keys": [
+        "llm_uncensored_eco"
+      ],
+      "parameter_file_bytes": 9527501184,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 9087,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 5249,
+        "peak_vram_measured_mib": null
+      },
+      "context_length": 8192,
+      "parallel_sequences": 1,
+      "batch_size": 128,
+      "ubatch_size": 32,
+      "gpu_layers": "all",
+      "flash_attention": true
+    },
+    "text_uncensored_high": {
+      "mode": "uncensored",
+      "family": "qwen35",
+      "label": "Qwen3.8 27B UD-Q3_K_XL · abliterated",
+      "roles": {
+        "model": "llm_uncensored_high"
+      },
+      "min_vram_mb": 14336,
+      "min_dram_mb": 4096,
+      "component_keys": [
+        "llm_uncensored_high"
+      ],
+      "parameter_file_bytes": 13326125984,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 12709,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 1627,
+        "peak_vram_measured_mib": null
+      },
+      "context_length": 4096,
+      "parallel_sequences": 1,
+      "batch_size": 128,
+      "ubatch_size": 32,
+      "gpu_layers": "all",
+      "flash_attention": true
+    },
+    "coder_uncensored_high": {
+      "mode": "uncensored",
+      "family": "qwen35",
+      "label": "Qwen3.8 27B UD-Q3_K_XL · abliterated",
+      "roles": {
+        "model": "llm_uncensored_high"
+      },
+      "min_vram_mb": 14336,
+      "min_dram_mb": 4096,
+      "component_keys": [
+        "llm_uncensored_high"
+      ],
+      "parameter_file_bytes": 13326125984,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 12709,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 1627,
+        "peak_vram_measured_mib": null
+      },
+      "context_length": 4096,
+      "parallel_sequences": 1,
+      "batch_size": 128,
+      "ubatch_size": 32,
+      "gpu_layers": "all",
+      "flash_attention": true
+    },
+    "vision_uncensored_eco": {
+      "mode": "uncensored",
+      "family": "qwen35",
+      "label": "Qwen3.5 9B Q8_0 · uncensored",
+      "roles": {
+        "model": "llm_uncensored_eco",
+        "mmproj": "vision_uncensored_projector"
+      },
+      "min_vram_mb": 12800,
+      "min_dram_mb": 4096,
+      "component_keys": [
+        "llm_uncensored_eco",
+        "vision_uncensored_projector"
+      ],
+      "parameter_file_bytes": 10449205632,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 9966,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 4370,
+        "peak_vram_measured_mib": null
+      },
+      "context_length": 8192,
+      "parallel_sequences": 1,
+      "batch_size": 128,
+      "ubatch_size": 32,
+      "gpu_layers": "all",
+      "flash_attention": true,
+      "max_images": 1,
+      "max_image_tokens": 1024
+    },
+    "vision_uncensored_high": {
+      "mode": "uncensored",
+      "family": "qwen35",
+      "label": "Qwen3.8 27B IQ3_S · abliterated",
+      "roles": {
+        "model": "vision_uncensored_high",
+        "mmproj": "vision_uncensored_high_projector"
+      },
+      "min_vram_mb": 14336,
+      "min_dram_mb": 4096,
+      "component_keys": [
+        "vision_uncensored_high",
+        "vision_uncensored_high_projector"
+      ],
+      "parameter_file_bytes": 12884046912,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 12288,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 2048,
+        "peak_vram_measured_mib": null
+      },
+      "context_length": 4096,
+      "parallel_sequences": 1,
+      "batch_size": 128,
+      "ubatch_size": 32,
+      "gpu_layers": "all",
+      "flash_attention": true,
+      "max_images": 1,
+      "max_image_tokens": 1024
+    },
+    "image_standard_eco": {
+      "mode": "standard",
+      "family": "flux3",
+      "label": "FLUX.3 Image Klein Q8_0 + Q8_0 encoder",
+      "roles": {
+        "diffusion_model": "image_standard_unet_eco",
+        "llm": "image_standard_llm_eco",
+        "vae": "image_standard_vae"
+      },
+      "min_vram_mb": 13312,
+      "min_dram_mb": 4096,
+      "steps": 16,
+      "cfg_scale": 1.0,
+      "max_width": 1024,
+      "max_height": 1024,
+      "component_keys": [
+        "image_standard_unet_eco",
+        "image_standard_llm_eco",
+        "image_standard_vae"
+      ],
+      "parameter_file_bytes": 10768335732,
+      "prompt_requirement": "Use a detailed full-scene caption. Any LLM caption expansion must finish and release its CUDA weights before this image pipeline loads.",
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 10270,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 4066,
+        "peak_vram_measured_mib": null
+      }
+    },
+    "image_standard_high": {
+      "mode": "standard",
+      "family": "flux3",
+      "label": "FLUX.3 Image Klein Base Q8_0 + Q8_0 encoder",
+      "roles": {
+        "diffusion_model": "image_standard_unet_high",
+        "llm": "image_standard_llm_high",
+        "vae": "image_standard_vae"
+      },
+      "min_vram_mb": 14336,
+      "min_dram_mb": 4096,
+      "steps": 50,
+      "cfg_scale": 3.5,
+      "max_width": 1024,
+      "max_height": 1024,
+      "component_keys": [
+        "image_standard_unet_high",
+        "image_standard_llm_high",
+        "image_standard_vae"
+      ],
+      "parameter_file_bytes": 10747888340,
+      "prompt_requirement": "Use a detailed full-scene caption. Any LLM caption expansion must finish and release its CUDA weights before this image pipeline loads.",
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 10250,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 4086,
+        "peak_vram_measured_mib": null
+      }
+    },
+    "image_uncensored_eco": {
+      "family": "moss_image",
+      "label": "MOSS-Image SFT Q4_K_S + trained uncensored LoRA",
+      "activation_status": "default_profile",
+      "steps": 30,
+      "cfg_scale": 3.0,
+      "flow_shift": 5.0,
+      "sampling_method": "euler",
+      "scheduler": "discrete",
+      "max_width": 768,
+      "max_height": 768,
+      "lora_scale": 0.8,
+      "lora_trigger": "moss_xvstyle",
+      "lora_apply_mode": "at_runtime",
+      "min_vram_mb": 12288,
+      "min_dram_mb": 4096,
+      "vram_estimate_is_benchmark": false,
+      "parameter_file_bytes": 9488643913,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "component_keys": [
+        "image_moss_uncensored_unet_eco",
+        "image_moss_uncensored_llm",
+        "image_moss_uncensored_vae",
+        "image_moss_uncensored_tokenizer",
+        "image_moss_uncensored_lora"
+      ],
+      "roles": {
+        "diffusion_model": "image_moss_uncensored_unet_eco",
+        "llm": "image_moss_uncensored_llm",
+        "vae": "image_moss_uncensored_vae",
+        "tokenizer": "image_moss_uncensored_tokenizer",
+        "lora": "image_moss_uncensored_lora"
+      },
+      "mode": "uncensored",
+      "checkpoint_mode": "diffusion_backbone_plus_trained_adapter",
+      "uncensoring_status": "adult_domain_lora_not_universal_abliteration",
+      "memory_planning": {
+        "serialized_components_mib": 9050,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 5286,
+        "peak_vram_measured_mib": null
+      }
+    },
+    "image_uncensored_high": {
+      "family": "moss_image",
+      "label": "MOSS-Image SFT Q8_0 + trained uncensored LoRA",
+      "activation_status": "default_profile",
+      "steps": 30,
+      "cfg_scale": 3.0,
+      "flow_shift": 5.0,
+      "sampling_method": "euler",
+      "scheduler": "discrete",
+      "max_width": 1024,
+      "max_height": 1024,
+      "lora_scale": 0.8,
+      "lora_trigger": "moss_xvstyle",
+      "lora_apply_mode": "at_runtime",
+      "min_vram_mb": 14336,
+      "min_dram_mb": 4096,
+      "vram_estimate_is_benchmark": false,
+      "parameter_file_bytes": 11729975113,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "component_keys": [
+        "image_moss_uncensored_unet_high",
+        "image_moss_uncensored_llm",
+        "image_moss_uncensored_vae",
+        "image_moss_uncensored_tokenizer",
+        "image_moss_uncensored_lora"
+      ],
+      "roles": {
+        "diffusion_model": "image_moss_uncensored_unet_high",
+        "llm": "image_moss_uncensored_llm",
+        "vae": "image_moss_uncensored_vae",
+        "tokenizer": "image_moss_uncensored_tokenizer",
+        "lora": "image_moss_uncensored_lora"
+      },
+      "mode": "uncensored",
+      "checkpoint_mode": "diffusion_backbone_plus_trained_adapter",
+      "uncensoring_status": "adult_domain_lora_not_universal_abliteration",
+      "memory_planning": {
+        "serialized_components_mib": 11187,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 3149,
+        "peak_vram_measured_mib": null
+      }
+    },
+    "image_moss_uncensored_eco": {
+      "family": "moss_image",
+      "label": "MOSS-Image SFT Q4_K_S + focused NSFW LoRA",
+      "activation_status": "optional_alias_of_default_profile",
+      "steps": 30,
+      "cfg_scale": 3.0,
+      "flow_shift": 5.0,
+      "sampling_method": "euler",
+      "scheduler": "discrete",
+      "max_width": 768,
+      "max_height": 768,
+      "lora_scale": 0.8,
+      "lora_trigger": "moss_xvstyle",
+      "lora_apply_mode": "at_runtime",
+      "min_vram_mb": 12288,
+      "min_dram_mb": 4096,
+      "vram_estimate_is_benchmark": false,
+      "parameter_file_bytes": 9488643913,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "component_keys": [
+        "image_moss_uncensored_unet_eco",
+        "image_moss_uncensored_llm",
+        "image_moss_uncensored_vae",
+        "image_moss_uncensored_tokenizer",
+        "image_moss_uncensored_lora"
+      ],
+      "roles": {
+        "diffusion_model": "image_moss_uncensored_unet_eco",
+        "llm": "image_moss_uncensored_llm",
+        "vae": "image_moss_uncensored_vae",
+        "tokenizer": "image_moss_uncensored_tokenizer",
+        "lora": "image_moss_uncensored_lora"
+      },
+      "mode": "uncensored",
+      "memory_planning": {
+        "serialized_components_mib": 9050,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 5286,
+        "peak_vram_measured_mib": null
+      }
+    },
+    "image_moss_uncensored_high": {
+      "family": "moss_image",
+      "label": "MOSS-Image SFT Q8_0 + focused NSFW LoRA",
+      "activation_status": "optional_alias_of_default_profile",
+      "steps": 30,
+      "cfg_scale": 3.0,
+      "flow_shift": 5.0,
+      "sampling_method": "euler",
+      "scheduler": "discrete",
+      "max_width": 1024,
+      "max_height": 1024,
+      "lora_scale": 0.8,
+      "lora_trigger": "moss_xvstyle",
+      "lora_apply_mode": "at_runtime",
+      "min_vram_mb": 14336,
+      "min_dram_mb": 4096,
+      "vram_estimate_is_benchmark": false,
+      "parameter_file_bytes": 11729975113,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "component_keys": [
+        "image_moss_uncensored_unet_high",
+        "image_moss_uncensored_llm",
+        "image_moss_uncensored_vae",
+        "image_moss_uncensored_tokenizer",
+        "image_moss_uncensored_lora"
+      ],
+      "roles": {
+        "diffusion_model": "image_moss_uncensored_unet_high",
+        "llm": "image_moss_uncensored_llm",
+        "vae": "image_moss_uncensored_vae",
+        "tokenizer": "image_moss_uncensored_tokenizer",
+        "lora": "image_moss_uncensored_lora"
+      },
+      "mode": "uncensored",
+      "memory_planning": {
+        "serialized_components_mib": 11187,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 3149,
+        "peak_vram_measured_mib": null
+      }
+    },
+    "video_standard_eco": {
+      "mode": "standard",
+      "family": "wan22",
+      "label": "Wan 2.2 TI2V 5B Q6_K",
+      "roles": {
+        "diffusion_model": "video_standard_dit_eco",
+        "t5xxl": "video_standard_t5",
+        "vae": "video_standard_vae"
+      },
+      "min_vram_mb": 12288,
+      "min_dram_mb": 4096,
+      "steps": 24,
+      "cfg_scale": 6.0,
+      "fps": 16,
+      "flow_shift": 3.0,
+      "max_width": 640,
+      "max_height": 384,
+      "max_frames": 25,
+      "component_keys": [
+        "video_standard_dit_eco",
+        "video_standard_t5",
+        "video_standard_vae"
+      ],
+      "parameter_file_bytes": 9276229952,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 8847,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 5489,
+        "peak_vram_measured_mib": null
+      }
+    },
+    "video_standard_high": {
+      "mode": "standard",
+      "family": "wan22",
+      "label": "Wan 2.2 TI2V 5B Q8_0",
+      "roles": {
+        "diffusion_model": "video_standard_dit_high",
+        "t5xxl": "video_standard_t5",
+        "vae": "video_standard_vae"
+      },
+      "min_vram_mb": 14336,
+      "min_dram_mb": 4096,
+      "steps": 40,
+      "cfg_scale": 6.0,
+      "fps": 16,
+      "flow_shift": 3.0,
+      "max_width": 832,
+      "max_height": 480,
+      "max_frames": 33,
+      "component_keys": [
+        "video_standard_dit_high",
+        "video_standard_t5",
+        "video_standard_vae"
+      ],
+      "parameter_file_bytes": 10464725312,
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 9980,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 4356,
+        "peak_vram_measured_mib": null
+      }
+    },
+    "video_uncensored_eco": {
+      "mode": "uncensored",
+      "family": "wan21",
+      "label": "Wan 2.2 T2V 14B Rapid v10 NSFW Q3_K",
+      "roles": {
+        "diffusion_model": "video_uncensored_dit",
+        "t5xxl": "video_uncensored_t5",
+        "vae": "video_uncensored_vae"
+      },
+      "min_vram_mb": 12288,
+      "min_dram_mb": 4096,
+      "steps": 4,
+      "cfg_scale": 1.0,
+      "fps": 16,
+      "flow_shift": 8.0,
+      "max_width": 512,
+      "max_height": 320,
+      "max_frames": 17,
+      "component_keys": [
+        "video_uncensored_dit",
+        "video_uncensored_t5",
+        "video_uncensored_vae"
+      ],
+      "parameter_file_bytes": 11083438966,
+      "sampling_method": "euler_a",
+      "scheduler": "beta",
+      "supported_tasks": [
+        "text_to_video"
+      ],
+      "architecture_note": "Wan2.2-derived merged single-expert T2V denoiser; use Wan 2.1 VAE. The family value retains the compatible single-denoiser runtime route.",
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 10570,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 3766,
+        "peak_vram_measured_mib": null
+      }
+    },
+    "video_uncensored_high": {
+      "mode": "uncensored",
+      "family": "wan21",
+      "label": "Wan 2.2 T2V 14B Rapid v10 NSFW Q3_K",
+      "roles": {
+        "diffusion_model": "video_uncensored_dit",
+        "t5xxl": "video_uncensored_t5",
+        "vae": "video_uncensored_vae"
+      },
+      "min_vram_mb": 14336,
+      "min_dram_mb": 4096,
+      "steps": 4,
+      "cfg_scale": 1.0,
+      "fps": 16,
+      "flow_shift": 8.0,
+      "max_width": 640,
+      "max_height": 384,
+      "max_frames": 25,
+      "component_keys": [
+        "video_uncensored_dit",
+        "video_uncensored_t5",
+        "video_uncensored_vae"
+      ],
+      "parameter_file_bytes": 11083438966,
+      "sampling_method": "euler_a",
+      "scheduler": "beta",
+      "supported_tasks": [
+        "text_to_video"
+      ],
+      "architecture_note": "Wan2.2-derived merged single-expert T2V denoiser; use Wan 2.1 VAE. The family value retains the compatible single-denoiser runtime route.",
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 10570,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 3766,
+        "peak_vram_measured_mib": null
+      }
+    },
+    "music_standard_eco": {
+      "mode": "standard",
+      "family": "acestep15",
+      "label": "ACE-Step 1.5 XL Turbo Q8_0 + 4B LM",
+      "roles": {
+        "lm": "music_standard_lm_eco",
+        "diffusion_model": "music_standard_dit_eco",
+        "llm": "music_standard_encoder",
+        "vae": "music_standard_vae"
+      },
+      "min_vram_mb": 11264,
+      "min_dram_mb": 4096,
+      "steps": 8,
+      "shift": 3,
+      "checkpoint_mode": "native_audio_checkpoint",
+      "application_filter": true,
+      "component_keys": [
+        "music_standard_lm_eco",
+        "music_standard_dit_eco",
+        "music_standard_encoder",
+        "music_standard_vae"
+      ],
+      "parameter_file_bytes": 10884718272,
+      "load_policy": "CUDA LM stage, unload LM, then CUDA synthesis and chunked VAE; never keep unrelated text/image/video pipelines resident.",
+      "uncensoring_status": "native_audio_checkpoint",
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 10381,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 3955,
+        "peak_vram_measured_mib": null
+      }
+    },
+    "music_standard_high": {
+      "mode": "standard",
+      "family": "acestep15",
+      "label": "ACE-Step 1.5 XL SFT Q8_0 + 4B LM",
+      "roles": {
+        "lm": "music_standard_lm_high",
+        "diffusion_model": "music_standard_dit_high",
+        "llm": "music_standard_encoder",
+        "vae": "music_standard_vae"
+      },
+      "min_vram_mb": 11264,
+      "min_dram_mb": 4096,
+      "steps": 50,
+      "shift": 1,
+      "checkpoint_mode": "native_audio_checkpoint",
+      "application_filter": true,
+      "component_keys": [
+        "music_standard_lm_high",
+        "music_standard_dit_high",
+        "music_standard_encoder",
+        "music_standard_vae"
+      ],
+      "parameter_file_bytes": 10884718240,
+      "load_policy": "CUDA LM stage, unload LM, then CUDA synthesis and chunked VAE; never keep unrelated text/image/video pipelines resident.",
+      "uncensoring_status": "native_audio_checkpoint",
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 10381,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 3955,
+        "peak_vram_measured_mib": null
+      }
+    },
+    "music_uncensored_eco": {
+      "mode": "uncensored",
+      "family": "acestep15",
+      "label": "ACE-Step 1.5 XL Turbo Q8_0 + 4B LM · application filter off",
+      "roles": {
+        "lm": "music_uncensored_lm_eco",
+        "diffusion_model": "music_uncensored_dit_eco",
+        "llm": "music_uncensored_encoder",
+        "vae": "music_uncensored_vae"
+      },
+      "min_vram_mb": 11264,
+      "min_dram_mb": 4096,
+      "steps": 8,
+      "shift": 3,
+      "checkpoint_mode": "native_audio_checkpoint",
+      "application_filter": false,
+      "component_keys": [
+        "music_uncensored_lm_eco",
+        "music_uncensored_dit_eco",
+        "music_uncensored_encoder",
+        "music_uncensored_vae"
+      ],
+      "parameter_file_bytes": 10884718272,
+      "load_policy": "CUDA LM stage, unload LM, then CUDA synthesis and chunked VAE; never keep unrelated text/image/video pipelines resident.",
+      "uncensoring_status": "native_weights_application_filter_only",
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 10381,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 3955,
+        "peak_vram_measured_mib": null
+      }
+    },
+    "music_uncensored_high": {
+      "mode": "uncensored",
+      "family": "acestep15",
+      "label": "ACE-Step 1.5 XL SFT Q8_0 + 4B LM · native unfiltered pipeline",
+      "roles": {
+        "lm": "music_uncensored_lm_high",
+        "diffusion_model": "music_uncensored_dit_high",
+        "llm": "music_uncensored_encoder",
+        "vae": "music_uncensored_vae"
+      },
+      "min_vram_mb": 11264,
+      "min_dram_mb": 4096,
+      "steps": 50,
+      "shift": 1,
+      "checkpoint_mode": "native_audio_checkpoint",
+      "application_filter": false,
+      "component_keys": [
+        "music_uncensored_lm_high",
+        "music_uncensored_dit_high",
+        "music_uncensored_encoder",
+        "music_uncensored_vae"
+      ],
+      "parameter_file_bytes": 10884718240,
+      "load_policy": "CUDA LM stage, unload LM, then CUDA synthesis and chunked VAE; never keep unrelated text/image/video pipelines resident.",
+      "uncensoring_status": "native_weights_application_filter_only",
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 10381,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 3955,
+        "peak_vram_measured_mib": null
+      }
+    },
+    "image_flux1_uncensored_eco": {
+      "mode": "uncensored",
+      "family": "flux1",
+      "label": "FLUX.1-dev Abliterated V2 Q4_K_M",
+      "roles": {
+        "diffusion_model": "image_uncensored_unet_eco",
+        "t5xxl": "image_uncensored_t5",
+        "clip_l": "image_uncensored_clip",
+        "vae": "image_uncensored_vae"
+      },
+      "min_vram_mb": 12288,
+      "min_dram_mb": 4096,
+      "steps": 20,
+      "cfg_scale": 1.0,
+      "guidance": 3.5,
+      "max_width": 768,
+      "max_height": 768,
+      "component_keys": [
+        "image_uncensored_unet_eco",
+        "image_uncensored_t5",
+        "image_uncensored_clip",
+        "image_uncensored_vae"
+      ],
+      "parameter_file_bytes": 10250402838,
+      "activation_status": "optional_abliterated_diffusion_alternative",
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 9776,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 4560,
+        "peak_vram_measured_mib": null
+      }
+    },
+    "image_flux1_uncensored_high": {
+      "mode": "uncensored",
+      "family": "flux1",
+      "label": "FLUX.1-dev Abliterated V2 Q6_K",
+      "roles": {
+        "diffusion_model": "image_uncensored_unet_high",
+        "t5xxl": "image_uncensored_t5",
+        "clip_l": "image_uncensored_clip",
+        "vae": "image_uncensored_vae"
+      },
+      "min_vram_mb": 14336,
+      "min_dram_mb": 4096,
+      "steps": 28,
+      "cfg_scale": 1.0,
+      "guidance": 3.5,
+      "max_width": 768,
+      "max_height": 768,
+      "component_keys": [
+        "image_uncensored_unet_high",
+        "image_uncensored_t5",
+        "image_uncensored_clip",
+        "image_uncensored_vae"
+      ],
+      "parameter_file_bytes": 13166935062,
+      "activation_status": "optional_abliterated_diffusion_alternative",
+      "model_cpu_offload": false,
+      "automatic_cpu_spill": false,
+      "vram_estimate_is_benchmark": false,
+      "memory_planning": {
+        "serialized_components_mib": 12557,
+        "process_budget_mib": 14336,
+        "headroom_after_serialized_components_mib": 1779,
+        "peak_vram_measured_mib": null
+      }
+    }
+  },
+  "roles": {
+    "llm_standard_eco": "Qwen3.5-9B-Q8_0.gguf",
+    "llm_standard_high": "Qwen3.8-27B-UD-Q3_K_XL.gguf",
+    "vision_standard_high": "Qwen3.8-27B-UD-IQ3_S.gguf",
+    "vision_standard_projector": "Qwen3.5-9B-mmproj-F16.gguf",
+    "llm_uncensored_eco": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q8_0.gguf",
+    "llm_uncensored_high": "Huihui-Qwen3.8-27B-abliterated-UD-Q3_K_XL.gguf",
+    "vision_uncensored_high": "Huihui-Qwen3.8-27B-abliterated-UD-IQ3_S.gguf",
+    "vision_uncensored_projector": "mmproj-Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16.gguf",
+    "image_standard_unet_eco": "flux3-image-klein-Q8_0.gguf",
+    "image_standard_llm_eco": "Qwen3VL-4B-Instruct-Q8_0.gguf",
+    "image_standard_vae": "flux2-vae.safetensors",
+    "image_standard_unet_high": "flux3-image-klein-base-Q8_0.gguf",
+    "image_standard_llm_high": "Qwen3VL-4B-Instruct-Q8_0.gguf",
+    "image_uncensored_unet_high": "T8-flux.1-dev-abliterated-V2-GGUF-Q6_K.gguf",
+    "image_uncensored_unet_eco": "T8-flux.1-dev-abliterated-V2-GGUF-Q4_K_M.gguf",
+    "image_uncensored_t5": "t5-v1_1-xxl-encoder-Q4_K_M.gguf",
+    "image_uncensored_clip": "clip_l_ablit_v2.safetensors",
+    "image_uncensored_vae": "ae_ablit_v2.safetensors",
+    "image_moss_uncensored_unet_high": "MOSS-Image-SFT-Q8_0.gguf",
+    "image_moss_uncensored_unet_eco": "MOSS-Image-SFT-Q4_K_S.gguf",
+    "image_moss_uncensored_llm": "Qwen3.5-9B-Q4_K_M.gguf",
+    "image_moss_uncensored_tokenizer": "moss-image-tokenizer.json",
+    "image_moss_uncensored_vae": "moss-image-vae.safetensors",
+    "image_moss_uncensored_lora": "MOSS-Image-NSFW-Uncensored-LoRA-Alternative-1750-F16.gguf",
+    "flux3_uncensored_encoder_high": "Qwen3-VL-4B-Instruct-Uncensored-Q8_0.gguf",
+    "flux3_uncensored_encoder_eco": "Qwen3-VL-4B-Instruct-Uncensored-AD-Q4_K.gguf",
+    "video_standard_dit_eco": "Wan2.2-TI2V-5B-Q6_K.gguf",
+    "video_standard_dit_high": "Wan2.2-TI2V-5B-Q8_0.gguf",
+    "video_standard_t5": "umt5-xxl-encoder-Q4_K_M.gguf",
+    "video_standard_vae": "wan2.2_vae.safetensors",
+    "video_uncensored_dit": "wan2.2-t2v-rapid-aio-v10-nsfw-Q3_K.gguf",
+    "video_uncensored_t5": "umt5-xxl-encoder-uncensored-pipeline-Q4_K_M.gguf",
+    "video_uncensored_vae": "wan_2.1_vae.safetensors",
+    "music_standard_lm_eco": "acestep-5Hz-lm-4B-Q8_0.gguf",
+    "music_standard_dit_eco": "acestep-v15-xl-turbo-Q8_0.gguf",
+    "music_standard_encoder": "Qwen3-Embedding-0.6B-Q8_0.gguf",
+    "music_standard_vae": "vae-BF16.gguf",
+    "music_standard_lm_high": "acestep-5Hz-lm-4B-Q8_0.gguf",
+    "music_standard_dit_high": "acestep-v15-xl-sft-Q8_0.gguf",
+    "music_uncensored_lm_eco": "acestep-5Hz-lm-4B-Q8_0.gguf",
+    "music_uncensored_dit_eco": "acestep-v15-xl-turbo-Q8_0.gguf",
+    "music_uncensored_encoder": "Qwen3-Embedding-0.6B-Q8_0.gguf",
+    "music_uncensored_vae": "vae-BF16.gguf",
+    "music_uncensored_lm_high": "acestep-5Hz-lm-4B-Q8_0.gguf",
+    "music_uncensored_dit_high": "acestep-v15-xl-sft-Q8_0.gguf",
+    "vision_standard_high_projector": "Qwen3.8-27B-standard-mmproj-F16.gguf",
+    "vision_uncensored_high_projector": "Qwen3.8-27B-uncensored-mmproj-BF16.gguf"
+  },
+  "models": [
+    {
+      "key": "llm_standard_eco",
+      "category": "llm",
+      "safety": "standard",
+      "filename": "Qwen3.5-9B-Q8_0.gguf",
+      "subdir": "llm",
+      "url": "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/3885219b6810b007914f3a7950a8d1b469d598a5/Qwen3.5-9B-Q8_0.gguf",
+      "size_bytes": 9527502048,
+      "approx_gb": 9.5275,
+      "description": "Aligned Qwen3.5 9B Q8_0; fast text/coding tier and Eco vision backbone. Higher precision than the former Q6_K. Text inference does not need the vision projector.",
+      "source_model": "unsloth/Qwen3.5-9B-GGUF",
+      "sha256": "809626574d0cb43d4becfa56169980da2bb448f2299270f7be443cb89d0a6ae4",
+      "tiers": [
+        "eco"
+      ],
+      "weight_modification": "quantization_only",
+      "requires": [],
+      "source_revision": "3885219b6810b007914f3a7950a8d1b469d598a5",
+      "source_file": "Qwen3.5-9B-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "llm_standard_high",
+      "category": "llm",
+      "safety": "standard",
+      "filename": "Qwen3.8-27B-UD-Q3_K_XL.gguf",
+      "subdir": "llm",
+      "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/4ca720788d1e01f1bff70c033e0d0028fd02e502/Qwen3.8-27B-UD-Q3_K_XL.gguf",
+      "size_bytes": 13146393504,
+      "approx_gb": 13.1464,
+      "description": "Aligned Qwen3.8 27B Dynamic Q3_K_XL, upgraded from IQ3_S. 12.24 GiB serialized weights; target a single 4096-token CUDA sequence on a 16 GiB card. Q4_K_M is too large for this no-offload budget.",
+      "source_model": "unsloth/Qwen3.8-27B-GGUF",
+      "sha256": "8c2a45ff85e7674ca185ec8eb6cdeab0e617ed9d8018caed0b64380eb2a67a5e",
+      "tiers": [
+        "high"
+      ],
+      "weight_modification": "quantization_only",
+      "requires": [],
+      "source_revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+      "source_file": "Qwen3.8-27B-UD-Q3_K_XL.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "vision_standard_high",
+      "category": "vision",
+      "safety": "standard",
+      "filename": "Qwen3.8-27B-UD-IQ3_S.gguf",
+      "subdir": "llm",
+      "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/4ca720788d1e01f1bff70c033e0d0028fd02e502/Qwen3.8-27B-UD-IQ3_S.gguf",
+      "size_bytes": 12040883104,
+      "approx_gb": 12.0409,
+      "description": "Qwen3.8 27B IQ3_S vision backbone, upgraded from Qwen3.5 9B. Uses its own 27B projector; smaller quantization than text High reserves memory for image encoding.",
+      "source_model": "unsloth/Qwen3.8-27B-GGUF",
+      "sha256": "d847e2c1e4aa276e4b7b8e9ad7628050e61e165d49ab995407bc36677a6f3864",
+      "tiers": [
+        "high"
+      ],
+      "weight_modification": "quantization_only",
+      "requires": [
+        "vision_standard_high_projector"
+      ],
+      "source_revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+      "source_file": "Qwen3.8-27B-UD-IQ3_S.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "vision_standard_projector",
+      "category": "vision",
+      "safety": "standard",
+      "filename": "Qwen3.5-9B-mmproj-F16.gguf",
+      "subdir": "llm",
+      "url": "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/3885219b6810b007914f3a7950a8d1b469d598a5/mmproj-F16.gguf",
+      "size_bytes": 918166080,
+      "approx_gb": 0.9182,
+      "description": "Matching Qwen3.5 9B F16 vision projector; executes on CUDA in both Standard and Uncensored vision tiers.",
+      "source_model": "unsloth/Qwen3.5-9B-GGUF",
+      "sha256": "f70dc3509053962b0d0d3ee8a7eacebf5d60aa560cad78254ae8698516ae029f",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "component": "vision_projector",
+      "weight_modification": "architecture_component",
+      "source_revision": "3885219b6810b007914f3a7950a8d1b469d598a5",
+      "source_file": "mmproj-F16.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "filename": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q8_0.gguf",
+      "subdir": "llm",
+      "category": "llm",
+      "url": "https://huggingface.co/HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive/resolve/0a41c68809d375475f954be12ba7c40efa56c2a9/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q8_0.gguf",
+      "size_bytes": 9527501184,
+      "approx_gb": 9.5275,
+      "source_model": "HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive",
+      "description": "Publisher-uncensored HauhauCS Qwen3.5 9B Q8_0; fast text/coding tier and Eco vision backbone. Modified language weights, rather than an application-filter toggle.",
+      "sha256": "99e7f2201c0046b05d2825e4d8be6a2efad2b87b071cd55d37bdd9fbe201a58b",
+      "key": "llm_uncensored_eco",
+      "safety": "uncensored",
+      "tiers": [
+        "eco"
+      ],
+      "weight_modification": "refusal_removal",
+      "requires": [],
+      "source_revision": "0a41c68809d375475f954be12ba7c40efa56c2a9",
+      "source_file": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "filename": "Huihui-Qwen3.8-27B-abliterated-UD-Q3_K_XL.gguf",
+      "subdir": "llm",
+      "category": "llm",
+      "url": "https://huggingface.co/huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF/resolve/1c69098e9c32db6dc06fc48f1d6cc75ad07da89e/Huihui-Qwen3.8-27B-abliterated-UD-Q3_K_XL.gguf",
+      "size_bytes": 13326125984,
+      "approx_gb": 13.3261,
+      "source_model": "huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF",
+      "description": "Huihui Qwen3.8 27B abliterated Dynamic Q3_K_XL, upgraded from IQ3_S. 12.41 GiB serialized weights; target one 4096-token CUDA sequence. Abliteration is publisher-described, not a guarantee of zero refusals.",
+      "sha256": "c6e144d78595c4656946187c2cee42f9062b3b4fa9874bc1be3e9263396253da",
+      "key": "llm_uncensored_high",
+      "safety": "uncensored",
+      "tiers": [
+        "high"
+      ],
+      "weight_modification": "abliteration",
+      "requires": [],
+      "source_revision": "1c69098e9c32db6dc06fc48f1d6cc75ad07da89e",
+      "source_file": "Huihui-Qwen3.8-27B-abliterated-UD-Q3_K_XL.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "filename": "Huihui-Qwen3.8-27B-abliterated-UD-IQ3_S.gguf",
+      "subdir": "llm",
+      "category": "vision",
+      "url": "https://huggingface.co/huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF/resolve/1c69098e9c32db6dc06fc48f1d6cc75ad07da89e/Huihui-Qwen3.8-27B-abliterated-UD-IQ3_S.gguf",
+      "size_bytes": 11952901024,
+      "approx_gb": 11.9529,
+      "source_model": "huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF",
+      "description": "Qwen3.8 27B abliterated IQ3_S vision backbone, upgraded from Qwen3.5 9B. Uses its own 27B projector; smaller quantization than text High reserves memory for image encoding.",
+      "sha256": "f785ad524b138cd53575410e07e93dfa6eff1cc92ca698264cb9c96973db6886",
+      "key": "vision_uncensored_high",
+      "safety": "uncensored",
+      "tiers": [
+        "high"
+      ],
+      "weight_modification": "refusal_removal",
+      "requires": [
+        "vision_uncensored_high_projector"
+      ],
+      "source_revision": "1c69098e9c32db6dc06fc48f1d6cc75ad07da89e",
+      "source_file": "Huihui-Qwen3.8-27B-abliterated-UD-IQ3_S.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "filename": "mmproj-Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16.gguf",
+      "subdir": "llm",
+      "category": "vision",
+      "url": "https://huggingface.co/HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive/resolve/0a41c68809d375475f954be12ba7c40efa56c2a9/mmproj-Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16.gguf",
+      "size_bytes": 921704448,
+      "approx_gb": 0.9217,
+      "source_model": "HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive",
+      "description": "Projector supplied with the uncensored model; a numerical vision component, not a content filter.",
+      "sha256": "05f662501f8bd45607b079723a3e238a4e888fd085a10a53f4057a0e250f6934",
+      "key": "vision_uncensored_projector",
+      "safety": "uncensored",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "component": "vision_projector",
+      "weight_modification": "architecture_component",
+      "source_revision": "0a41c68809d375475f954be12ba7c40efa56c2a9",
+      "source_file": "mmproj-Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "image_standard_unet_eco",
+      "category": "image",
+      "safety": "standard",
+      "filename": "flux3-image-klein-Q8_0.gguf",
+      "subdir": "diffusion",
+      "url": "https://huggingface.co/leejet/flux-3-image-klein-GGUF/resolve/1c2ad2f9b9247ccca6506a23bdb033fdb0873321/flux3-image-klein-Q8_0.gguf",
+      "size_bytes": 6151716032,
+      "approx_gb": 6.1517,
+      "description": "FLUX.3 Image Klein distilled Q8_0, 16 steps and CFG 1. Upgraded from Q6_K; requires a full scene caption and the matching Qwen3-VL-4B encoder and FLUX.2 VAE.",
+      "source_model": "leejet/flux-3-image-klein-GGUF",
+      "sha256": "8b71ffd749bcacbd50cc0acca4f2d31a044c94412743e1e780db99bf13f89752",
+      "tiers": [
+        "eco"
+      ],
+      "component": "diffusion_transformer",
+      "weight_modification": "quantization_only",
+      "requires": [
+        "image_standard_llm_eco",
+        "image_standard_vae"
+      ],
+      "source_revision": "1c2ad2f9b9247ccca6506a23bdb033fdb0873321",
+      "source_file": "flux3-image-klein-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "image_standard_llm_eco",
+      "category": "image",
+      "safety": "standard",
+      "filename": "Qwen3VL-4B-Instruct-Q8_0.gguf",
+      "subdir": "text_encoders",
+      "url": "https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct-GGUF/resolve/1cd86afb9a95c410a6038ab3b40d8b578c892266/Qwen3VL-4B-Instruct-Q8_0.gguf",
+      "size_bytes": 4280406144,
+      "approx_gb": 4.2804,
+      "description": "Official Qwen3-VL-4B Q8_0 encoder for FLUX.3. Upgraded from Q4_K_M; the same byte-identical encoder serves both standard image tiers.",
+      "source_model": "Qwen/Qwen3-VL-4B-Instruct-GGUF",
+      "sha256": "054721f478bc5fa6beffb7f38eae575d45298f88cbb8d2f83ef675a727863eb1",
+      "tiers": [
+        "eco"
+      ],
+      "component": "text_encoder",
+      "weight_modification": "quantization_only",
+      "source_revision": "1cd86afb9a95c410a6038ab3b40d8b578c892266",
+      "source_file": "Qwen3VL-4B-Instruct-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "image_standard_vae",
+      "category": "image",
+      "safety": "standard",
+      "filename": "flux2-vae.safetensors",
+      "subdir": "vae",
+      "url": "https://huggingface.co/Comfy-Org/flux2-dev/resolve/9630c1b4b6e690497ae0c19bb6b1b35d4ebedcb7/split_files/vae/flux2-vae.safetensors",
+      "size_bytes": 336213556,
+      "approx_gb": 0.3362,
+      "description": "FLUX.2 VAE used by FLUX.3; CUDA spatial tiling limits decode memory.",
+      "source_model": "Comfy-Org/flux2-dev",
+      "sha256": "d64f3a68e1cc4f9f4e29b6e0da38a0204fe9a49f2d4053f0ec1fa1ca02f9c4b5",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "component": "vae",
+      "weight_modification": "architecture_component",
+      "source_revision": "9630c1b4b6e690497ae0c19bb6b1b35d4ebedcb7",
+      "source_file": "split_files/vae/flux2-vae.safetensors",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "image_standard_unet_high",
+      "category": "image",
+      "safety": "standard",
+      "filename": "flux3-image-klein-base-Q8_0.gguf",
+      "subdir": "diffusion",
+      "url": "https://huggingface.co/leejet/flux-3-image-klein-base-GGUF/resolve/a88b00249c4dcf4a2bb784c2a10f69656c8f309b/flux3-image-klein-base-Q8_0.gguf",
+      "size_bytes": 6131268640,
+      "approx_gb": 6.1313,
+      "description": "FLUX.3 Image Klein Base Q8_0; 50-step CFG 3.5 quality preset. Requires Qwen3-VL 4B encoder and FLUX.2 VAE, not T5/CLIP-L.",
+      "source_model": "leejet/flux-3-image-klein-base-GGUF",
+      "sha256": "ab3b8faa5391478c2d6c74321745fd009858a325ca9b4fb2776c6401da11c270",
+      "tiers": [
+        "high"
+      ],
+      "component": "diffusion_transformer",
+      "weight_modification": "quantization_only",
+      "requires": [
+        "image_standard_llm_high",
+        "image_standard_vae"
+      ],
+      "source_revision": "a88b00249c4dcf4a2bb784c2a10f69656c8f309b",
+      "source_file": "flux3-image-klein-base-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "image_standard_llm_high",
+      "category": "image",
+      "safety": "standard",
+      "filename": "Qwen3VL-4B-Instruct-Q8_0.gguf",
+      "subdir": "text_encoders",
+      "url": "https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct-GGUF/resolve/1cd86afb9a95c410a6038ab3b40d8b578c892266/Qwen3VL-4B-Instruct-Q8_0.gguf",
+      "size_bytes": 4280406144,
+      "approx_gb": 4.2804,
+      "description": "FLUX.3 Qwen3-VL 4B Q8_0 text encoder (Standard aligned), resident on CUDA.",
+      "source_model": "Qwen/Qwen3-VL-4B-Instruct-GGUF",
+      "sha256": "054721f478bc5fa6beffb7f38eae575d45298f88cbb8d2f83ef675a727863eb1",
+      "tiers": [
+        "high"
+      ],
+      "component": "text_encoder",
+      "weight_modification": "quantization_only",
+      "source_revision": "1cd86afb9a95c410a6038ab3b40d8b578c892266",
+      "source_file": "Qwen3VL-4B-Instruct-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "filename": "T8-flux.1-dev-abliterated-V2-GGUF-Q6_K.gguf",
+      "subdir": "diffusion",
+      "category": "image",
+      "url": "https://huggingface.co/t8star/flux.1-dev-abliterated-V2-GGUF/resolve/0f804e4d6a6c9a43e7b810aa4c2f59f7ef18ec3f/T8-flux.1-dev-abliterated-V2-GGUF-Q6_K.gguf",
+      "size_bytes": 9857000736,
+      "approx_gb": 9.857,
+      "source_model": "t8star/flux.1-dev-abliterated-V2-GGUF",
+      "description": "FLUX.1-dev Abliterated V2 diffusion transformer, Q6_K; different image-backbone weights from standard FLUX.3.",
+      "sha256": "9a7ef0087e932ccff807b73b19b85aef75c0449883d01aa06c0ada4f1911608b",
+      "key": "image_uncensored_unet_high",
+      "safety": "uncensored",
+      "tiers": [
+        "high"
+      ],
+      "component": "diffusion_transformer",
+      "weight_modification": "publisher_abliterated_diffusion",
+      "requires": [
+        "image_uncensored_t5",
+        "image_uncensored_clip",
+        "image_uncensored_vae"
+      ],
+      "source_revision": "0f804e4d6a6c9a43e7b810aa4c2f59f7ef18ec3f",
+      "source_file": "T8-flux.1-dev-abliterated-V2-GGUF-Q6_K.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "filename": "T8-flux.1-dev-abliterated-V2-GGUF-Q4_K_M.gguf",
+      "subdir": "diffusion",
+      "category": "image",
+      "url": "https://huggingface.co/t8star/flux.1-dev-abliterated-V2-GGUF/resolve/21505a89e2fbab4976cc96e4b095c300eb3c2053/T8-flux.1-dev-abliterated-V2-GGUF-Q4_K_M.gguf",
+      "size_bytes": 6940468512,
+      "approx_gb": 6.9405,
+      "source_model": "t8star/flux.1-dev-abliterated-V2-GGUF",
+      "description": "FLUX.1-dev Abliterated V2 diffusion transformer, Q4_K_M; independent uncensored image backbone.",
+      "sha256": "f68579dfc3a5715f9618a3547f17708e952d2d3cd36703e40f2de7935e785168",
+      "key": "image_uncensored_unet_eco",
+      "safety": "uncensored",
+      "tiers": [
+        "eco"
+      ],
+      "component": "diffusion_transformer",
+      "weight_modification": "publisher_abliterated_diffusion",
+      "requires": [
+        "image_uncensored_t5",
+        "image_uncensored_clip",
+        "image_uncensored_vae"
+      ],
+      "source_revision": "21505a89e2fbab4976cc96e4b095c300eb3c2053",
+      "source_file": "T8-flux.1-dev-abliterated-V2-GGUF-Q4_K_M.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "filename": "t5-v1_1-xxl-encoder-Q4_K_M.gguf",
+      "subdir": "text_encoders",
+      "category": "image",
+      "url": "https://huggingface.co/city96/t5-v1_1-xxl-encoder-gguf/resolve/005a6ea51a7d0b84d677b3e633bb52a8c85a83d9/t5-v1_1-xxl-encoder-Q4_K_M.gguf",
+      "size_bytes": 2896123072,
+      "approx_gb": 2.8961,
+      "source_model": "city96/t5-v1_1-xxl-encoder-gguf",
+      "description": "T5 feature encoder for the FLUX.1 pipeline; numerical conditioning component, not a chat-refusal model.",
+      "sha256": "6be2b0b7e2de7cf2919340c88cb802a103a997ce46c53131cec91958c1db1af4",
+      "key": "image_uncensored_t5",
+      "safety": "uncensored",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "component": "text_encoder",
+      "weight_modification": "quantization_only",
+      "source_revision": "005a6ea51a7d0b84d677b3e633bb52a8c85a83d9",
+      "source_file": "t5-v1_1-xxl-encoder-Q4_K_M.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "filename": "clip_l_ablit_v2.safetensors",
+      "subdir": "text_encoders",
+      "category": "image",
+      "url": "https://huggingface.co/georgesung/flux.1-dev-abliterated-merged/resolve/462c3d913f1ab72288fcf8e8c20120e8d0b427ab/clip_l_ablit_v2.safetensors",
+      "size_bytes": 246144352,
+      "approx_gb": 0.2461,
+      "source_model": "georgesung/flux.1-dev-abliterated-merged",
+      "description": "CLIP-L supplied with the abliterated V2 pipeline.",
+      "sha256": "31a25126e03e7aab02a358aa010bb0914a8a5280122170d9aad9796d699683b8",
+      "key": "image_uncensored_clip",
+      "safety": "uncensored",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "component": "text_encoder",
+      "weight_modification": "publisher_pipeline_component",
+      "source_revision": "462c3d913f1ab72288fcf8e8c20120e8d0b427ab",
+      "source_file": "clip_l_ablit_v2.safetensors",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "filename": "ae_ablit_v2.safetensors",
+      "subdir": "vae",
+      "category": "image",
+      "url": "https://huggingface.co/georgesung/flux.1-dev-abliterated-merged/resolve/462c3d913f1ab72288fcf8e8c20120e8d0b427ab/ae_ablit_v2.safetensors",
+      "size_bytes": 167666902,
+      "approx_gb": 0.1677,
+      "source_model": "georgesung/flux.1-dev-abliterated-merged",
+      "description": "VAE supplied with the abliterated V2 pipeline; a decoder, not a refusal-removal model.",
+      "sha256": "2ed11d2a24c895d4c9ae8440e2e3a43208bcddf4236923e5413f0c3c34f21ecd",
+      "key": "image_uncensored_vae",
+      "safety": "uncensored",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "component": "vae",
+      "weight_modification": "architecture_component",
+      "source_revision": "462c3d913f1ab72288fcf8e8c20120e8d0b427ab",
+      "source_file": "ae_ablit_v2.safetensors",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "image_moss_uncensored_unet_high",
+      "category": "image",
+      "safety": "uncensored",
+      "filename": "MOSS-Image-SFT-Q8_0.gguf",
+      "subdir": "diffusion",
+      "url": "https://huggingface.co/axiomofmind/Moss-Image-SFT-GGUF/resolve/d8a587c3a66bcab191e93bdd6f742d41b1104c68/MOSS-Image-SFT-Q8_0.gguf",
+      "size_bytes": 5705576416,
+      "approx_gb": 5.7056,
+      "description": "MOSS-Image-SFT Q8_0 backbone for the separate High uncensored-adapter bundle. The backbone is an unchanged SFT quantization; the required LoRA supplies the additional adult-domain training. Not a FLUX.3 replacement.",
+      "source_model": "axiomofmind/Moss-Image-SFT-GGUF",
+      "sha256": "8349ebdd643f2c66da6b25789db7df3cc708a86c051c56207fde699156bfad8e",
+      "component": "diffusion_transformer",
+      "weight_modification": "quantization_only",
+      "tiers": [
+        "high"
+      ],
+      "package": "moss_uncensored",
+      "requires": [
+        "image_moss_uncensored_llm",
+        "image_moss_uncensored_vae",
+        "image_moss_uncensored_tokenizer",
+        "image_moss_uncensored_lora"
+      ],
+      "source_revision": "d8a587c3a66bcab191e93bdd6f742d41b1104c68",
+      "source_file": "MOSS-Image-SFT-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "image_moss_uncensored_unet_eco",
+      "category": "image",
+      "safety": "uncensored",
+      "filename": "MOSS-Image-SFT-Q4_K_S.gguf",
+      "subdir": "diffusion",
+      "url": "https://huggingface.co/axiomofmind/Moss-Image-SFT-GGUF/resolve/d8a587c3a66bcab191e93bdd6f742d41b1104c68/MOSS-Image-SFT-Q4_K_S.gguf",
+      "size_bytes": 3464245216,
+      "approx_gb": 3.4642,
+      "description": "MOSS-Image-SFT mixed-precision Q4_K_S backbone for the separate Eco uncensored-adapter bundle. Requires the same MOSS-specific tokenizer, encoder, VAE and LoRA as High.",
+      "source_model": "axiomofmind/Moss-Image-SFT-GGUF",
+      "sha256": "2aa25ebefa78ac0aa243e7fb29dc0b8fc47d0367d5161ea87ef753bed130ab1b",
+      "component": "diffusion_transformer",
+      "weight_modification": "quantization_only",
+      "tiers": [
+        "eco"
+      ],
+      "package": "moss_uncensored",
+      "requires": [
+        "image_moss_uncensored_llm",
+        "image_moss_uncensored_vae",
+        "image_moss_uncensored_tokenizer",
+        "image_moss_uncensored_lora"
+      ],
+      "source_revision": "d8a587c3a66bcab191e93bdd6f742d41b1104c68",
+      "source_file": "MOSS-Image-SFT-Q4_K_S.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "image_moss_uncensored_llm",
+      "category": "image",
+      "safety": "uncensored",
+      "filename": "Qwen3.5-9B-Q4_K_M.gguf",
+      "subdir": "text_encoders",
+      "url": "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/3885219b6810b007914f3a7950a8d1b469d598a5/Qwen3.5-9B-Q4_K_M.gguf",
+      "size_bytes": 5680522464,
+      "approx_gb": 5.6805,
+      "description": "Unmodified Qwen3.5-9B Q4_K_M text encoder for both MOSS bundle tiers; use the separate official MOSS tokenizer. Grouped with the uncensored bundle for installation, not an abliterated model.",
+      "source_model": "unsloth/Qwen3.5-9B-GGUF",
+      "sha256": "03b74727a860a56338e042c4420bb3f04b2fec5734175f4cb9fa853daf52b7e8",
+      "component": "text_encoder",
+      "weight_modification": "quantization_only",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "package": "moss_uncensored",
+      "source_revision": "3885219b6810b007914f3a7950a8d1b469d598a5",
+      "source_file": "Qwen3.5-9B-Q4_K_M.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "image_moss_uncensored_tokenizer",
+      "category": "image",
+      "safety": "uncensored",
+      "filename": "moss-image-tokenizer.json",
+      "subdir": "text_encoders",
+      "url": "https://huggingface.co/OpenMOSS-Team/MOSS-Image-SFT/resolve/f972bd4b4b9e3852133cc5da954d87bc32cd8fb9/tokenizer/tokenizer.json",
+      "size_bytes": 19989325,
+      "approx_gb": 0.02,
+      "description": "Official MOSS tokenizer, explicitly passed with --tokenizer. The tokenizer embedded in a general Qwen3.5 GGUF is not a substitute.",
+      "source_model": "OpenMOSS-Team/MOSS-Image-SFT",
+      "sha256": "06b9509352d2af50381ab2247e083b80d32d5c0aba91c272ca9ff729b6a0e523",
+      "component": "tokenizer",
+      "weight_modification": "none",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "package": "moss_uncensored",
+      "source_revision": "f972bd4b4b9e3852133cc5da954d87bc32cd8fb9",
+      "source_file": "tokenizer/tokenizer.json",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "image_moss_uncensored_vae",
+      "category": "image",
+      "safety": "uncensored",
+      "filename": "moss-image-vae.safetensors",
+      "subdir": "vae",
+      "url": "https://huggingface.co/OpenMOSS-Team/MOSS-Image-SFT/resolve/f972bd4b4b9e3852133cc5da954d87bc32cd8fb9/vae/diffusion_pytorch_model.safetensors",
+      "size_bytes": 249521372,
+      "approx_gb": 0.2495,
+      "description": "Official MOSS VAE for the separate MOSS image bundle. Grouped with its bundle for installation; the VAE has not been modified to remove restrictions.",
+      "source_model": "OpenMOSS-Team/MOSS-Image-SFT",
+      "sha256": "c3bdf94dc67ec69b30ea9fe1fa8340085679cae64d019f7c7e4a9921f1a7f17a",
+      "component": "vae",
+      "weight_modification": "none",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "package": "moss_uncensored",
+      "source_revision": "f972bd4b4b9e3852133cc5da954d87bc32cd8fb9",
+      "source_file": "vae/diffusion_pytorch_model.safetensors",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "image_moss_uncensored_lora",
+      "category": "image",
+      "safety": "uncensored",
+      "filename": "MOSS-Image-NSFW-Uncensored-LoRA-Alternative-1750-F16.gguf",
+      "subdir": "lora",
+      "url": "https://huggingface.co/axiomofmind/Moss-image-nsfw-uncensored-lora-GGUF/resolve/a21e2465ff6a3ba099439fa9b8c4af708ed19761/MOSS-Image-NSFW-Uncensored-LoRA-Alternative-1750-F16.gguf",
+      "size_bytes": 74365536,
+      "approx_gb": 0.0744,
+      "description": "Publisher-current focused 1750-step MOSS adult-domain LoRA, F16 GGUF. Apply to a MOSS-Image-SFT backbone at runtime. This is an adapter, not a standalone image model or a universal removal of learned limits.",
+      "source_model": "axiomofmind/Moss-image-nsfw-uncensored-lora-GGUF",
+      "sha256": "6366d060b9653c5b72c0694238a09b01787f3ca610e7f27af051a5aed8fff7d8",
+      "component": "lora",
+      "weight_modification": "additional_training_adapter",
+      "recommended_scale": 0.8,
+      "trigger": "moss_xvstyle",
+      "lora_apply_mode": "at_runtime",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "package": "moss_uncensored",
+      "source_revision": "a21e2465ff6a3ba099439fa9b8c4af708ed19761",
+      "source_file": "MOSS-Image-NSFW-Uncensored-LoRA-Alternative-1750-F16.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "filename": "Qwen3-VL-4B-Instruct-Uncensored-Q8_0.gguf",
+      "subdir": "text_encoders",
+      "category": "image",
+      "url": "https://huggingface.co/AtomicChat/FLUX-3-Image-Klein-TE-Uncensored-GGUF/resolve/84746e03e397cb042bd264c0cb9e40db9398c001/Qwen3-VL-4B-Instruct-Uncensored-Q8_0.gguf",
+      "size_bytes": 4280406688,
+      "approx_gb": 4.2804,
+      "source_model": "AtomicChat/FLUX-3-Image-Klein-TE-Uncensored-GGUF",
+      "description": "Optional refusal-direction-edited FLUX.3 text encoder. This does not uncensor or modify the FLUX.3 diffusion backbone.",
+      "sha256": "6440e871673bb414c0e026c39147ca2f453d3a8a7492cf53230693b02ee7ad8e",
+      "key": "flux3_uncensored_encoder_high",
+      "safety": "uncensored",
+      "tiers": [
+        "high"
+      ],
+      "component": "text_encoder",
+      "weight_modification": "refusal_direction_projection",
+      "package": "optional_flux3_encoder",
+      "source_revision": "84746e03e397cb042bd264c0cb9e40db9398c001",
+      "source_file": "Qwen3-VL-4B-Instruct-Uncensored-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "filename": "Qwen3-VL-4B-Instruct-Uncensored-AD-Q4_K.gguf",
+      "subdir": "text_encoders",
+      "category": "image",
+      "url": "https://huggingface.co/AtomicChat/FLUX-3-Image-Klein-TE-Uncensored-GGUF/resolve/84746e03e397cb042bd264c0cb9e40db9398c001/Qwen3-VL-4B-Instruct-Uncensored-AD-Q4_K.gguf",
+      "size_bytes": 2488824256,
+      "approx_gb": 2.4888,
+      "source_model": "AtomicChat/FLUX-3-Image-Klein-TE-Uncensored-GGUF",
+      "description": "Optional refusal-direction-edited FLUX.3 text encoder. This does not uncensor or modify the FLUX.3 diffusion backbone.",
+      "sha256": "6839783f1d21a9f45ec0aa652749185c082f0bf6ba6d00c230307fd9055cec68",
+      "key": "flux3_uncensored_encoder_eco",
+      "safety": "uncensored",
+      "tiers": [
+        "eco"
+      ],
+      "component": "text_encoder",
+      "weight_modification": "refusal_direction_projection",
+      "package": "optional_flux3_encoder",
+      "source_revision": "84746e03e397cb042bd264c0cb9e40db9398c001",
+      "source_file": "Qwen3-VL-4B-Instruct-Uncensored-AD-Q4_K.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "video_standard_dit_eco",
+      "category": "video",
+      "safety": "standard",
+      "filename": "Wan2.2-TI2V-5B-Q6_K.gguf",
+      "subdir": "diffusion",
+      "url": "https://huggingface.co/QuantStack/Wan2.2-TI2V-5B-GGUF/resolve/57437632ddd08bdcbd1508c866aa22e126ed51d2/Wan2.2-TI2V-5B-Q6_K.gguf",
+      "size_bytes": 4211683680,
+      "approx_gb": 4.2117,
+      "description": "Wan 2.2 TI2V 5B Q6_K, upgraded from Q5_K_M. Compact text/image-to-video backbone; paired with the Wan 2.2 5B VAE.",
+      "source_model": "QuantStack/Wan2.2-TI2V-5B-GGUF",
+      "sha256": "355f6bee35c4c6cbd0f275112619fe8ac6f7b9b067b885723667b3bde29497c3",
+      "tiers": [
+        "eco"
+      ],
+      "component": "diffusion_transformer",
+      "requires": [
+        "video_standard_t5",
+        "video_standard_vae"
+      ],
+      "source_revision": "57437632ddd08bdcbd1508c866aa22e126ed51d2",
+      "source_file": "Wan2.2-TI2V-5B-Q6_K.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "video_standard_dit_high",
+      "category": "video",
+      "safety": "standard",
+      "filename": "Wan2.2-TI2V-5B-Q8_0.gguf",
+      "subdir": "diffusion",
+      "url": "https://huggingface.co/QuantStack/Wan2.2-TI2V-5B-GGUF/resolve/57437632ddd08bdcbd1508c866aa22e126ed51d2/Wan2.2-TI2V-5B-Q8_0.gguf",
+      "size_bytes": 5400179040,
+      "approx_gb": 5.4002,
+      "description": "Wan 2.2 TI2V 5B Q8_0; compact video quality tier, up to 832x480 / 33 frames / 40 steps on CUDA.",
+      "source_model": "QuantStack/Wan2.2-TI2V-5B-GGUF",
+      "sha256": "57bece983817ab2f957546683bb670f13be7d99022d45674840cd999a050ea8f",
+      "tiers": [
+        "high"
+      ],
+      "component": "diffusion_transformer",
+      "requires": [
+        "video_standard_t5",
+        "video_standard_vae"
+      ],
+      "source_revision": "57437632ddd08bdcbd1508c866aa22e126ed51d2",
+      "source_file": "Wan2.2-TI2V-5B-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "video_standard_t5",
+      "category": "video",
+      "safety": "standard",
+      "filename": "umt5-xxl-encoder-Q4_K_M.gguf",
+      "subdir": "text_encoders",
+      "url": "https://huggingface.co/city96/umt5-xxl-encoder-gguf/resolve/b535255bee98c2b0a59ea7c0ae2dcd0c6657b3b7/umt5-xxl-encoder-Q4_K_M.gguf",
+      "size_bytes": 3655145312,
+      "approx_gb": 3.6551,
+      "description": "Shared UMT5-XXL Q4_K_M on CUDA; limits total pipeline VRAM rather than loading an FP8/Q8 encoder on CPU.",
+      "source_model": "city96/umt5-xxl-encoder-gguf",
+      "sha256": "17cf97a5bbbc60a646d6105b832b6f657ce904a8a1ad970e4b59df0c67584a40",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "component": "text_encoder",
+      "weight_modification": "quantization_only",
+      "source_revision": "b535255bee98c2b0a59ea7c0ae2dcd0c6657b3b7",
+      "source_file": "umt5-xxl-encoder-Q4_K_M.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "video_standard_vae",
+      "category": "video",
+      "safety": "standard",
+      "filename": "wan2.2_vae.safetensors",
+      "subdir": "vae",
+      "url": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/ee6f4a40737a995bf5818954cfce6d59443b0f04/split_files/vae/wan2.2_vae.safetensors",
+      "size_bytes": 1409400960,
+      "approx_gb": 1.4094,
+      "description": "Matching Wan 2.2 TI2V 5B VAE (1.41 GB); Wan 2.1 VAE is incompatible.",
+      "source_model": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+      "sha256": "e40321bd36b9709991dae2530eb4ac303dd168276980d3e9bc4b6e2b75fed156",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "component": "vae",
+      "weight_modification": "architecture_component",
+      "source_revision": "ee6f4a40737a995bf5818954cfce6d59443b0f04",
+      "source_file": "split_files/vae/wan2.2_vae.safetensors",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "filename": "wan2.2-t2v-rapid-aio-v10-nsfw-Q3_K.gguf",
+      "subdir": "diffusion",
+      "category": "video",
+      "url": "https://huggingface.co/befox/WAN2.2-14B-Rapid-AllInOne-GGUF/resolve/f55c762a5bfae157e3f0ca9e9a959de53dbf2a6d/v10/wan2.2-t2v-rapid-aio-v10-nsfw-Q3_K.gguf",
+      "size_bytes": 7174478336,
+      "approx_gb": 7.1745,
+      "source_model": "befox/WAN2.2-14B-Rapid-AllInOne-GGUF",
+      "description": "Wan 2.2 low-noise T2V 14B Rapid v10 NSFW merge, Q3_K. Replaces experimental Wan 1.3B. One denoiser with trained NSFW adapters merged into its weights, not a two-expert A14B pipeline. Publisher recommends 4 steps / CFG 1; upstream project is no longer maintained. No 16 GiB quality or peak-memory benchmark was performed here.",
+      "sha256": "695c6ee294ec1b62bfa172b9599ea3f08eacd120fc4e1e20567ca4ffaa341542",
+      "key": "video_uncensored_dit",
+      "safety": "uncensored",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "component": "diffusion_transformer",
+      "weight_modification": "publisher_nsfw_finetune_and_accelerator_merge",
+      "requires": [
+        "video_uncensored_t5",
+        "video_uncensored_vae"
+      ],
+      "source_revision": "f55c762a5bfae157e3f0ca9e9a959de53dbf2a6d",
+      "source_file": "v10/wan2.2-t2v-rapid-aio-v10-nsfw-Q3_K.gguf",
+      "metadata_verified_on": "2026-10-31",
+      "supported_tasks": [
+        "text_to_video"
+      ]
+    },
+    {
+      "filename": "umt5-xxl-encoder-uncensored-pipeline-Q4_K_M.gguf",
+      "subdir": "text_encoders",
+      "category": "video",
+      "url": "https://huggingface.co/city96/umt5-xxl-encoder-gguf/resolve/b535255bee98c2b0a59ea7c0ae2dcd0c6657b3b7/umt5-xxl-encoder-Q4_K_M.gguf",
+      "size_bytes": 3655145312,
+      "approx_gb": 3.6551,
+      "source_model": "city96/umt5-xxl-encoder-gguf",
+      "description": "Unmodified architecture-compatible UMT5-XXL Q4_K_M encoder, separately registered for the uncensored video pipeline. Replaces the 6.27 GiB FP8 encoder to leave room for the larger 14B denoiser. The NSFW modification is in the denoiser, not this encoder.",
+      "sha256": "17cf97a5bbbc60a646d6105b832b6f657ce904a8a1ad970e4b59df0c67584a40",
+      "key": "video_uncensored_t5",
+      "safety": "uncensored",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "component": "text_encoder",
+      "weight_modification": "quantization_only",
+      "source_revision": "b535255bee98c2b0a59ea7c0ae2dcd0c6657b3b7",
+      "source_file": "umt5-xxl-encoder-Q4_K_M.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "filename": "wan_2.1_vae.safetensors",
+      "subdir": "vae",
+      "category": "video",
+      "url": "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/123acf1cc74bccbb9bfff8ac1ee72edc08c2341d/split_files/vae/wan_2.1_vae.safetensors",
+      "size_bytes": 253815318,
+      "approx_gb": 0.2538,
+      "source_model": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+      "description": "Matching Wan 2.1 decoder for the 1.3B fine-tune; not interchangeable with the Wan 2.2 5B decoder.",
+      "sha256": "2fc39d31359a4b0a64f55876d8ff7fa8d780956ae2cb13463b0223e15148976b",
+      "key": "video_uncensored_vae",
+      "safety": "uncensored",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "component": "vae",
+      "weight_modification": "architecture_component",
+      "source_revision": "123acf1cc74bccbb9bfff8ac1ee72edc08c2341d",
+      "source_file": "split_files/vae/wan_2.1_vae.safetensors",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "music_standard_lm_eco",
+      "category": "music",
+      "safety": "standard",
+      "filename": "acestep-5Hz-lm-4B-Q8_0.gguf",
+      "subdir": "music/standard",
+      "url": "https://huggingface.co/Serveurperso/ACE-Step-1.5-GGUF/resolve/666ac70204440867d8c01ba4b119cc79c95b370a/acestep-5Hz-lm-4B-Q8_0.gguf",
+      "size_bytes": 4457323648,
+      "approx_gb": 4.4573,
+      "description": "ACE-Step 1.5 4B Q8_0 composition LM, upgraded from 1.7B. Runs on CUDA and must be released before the synthesis stage.",
+      "source_model": "Serveurperso/ACE-Step-1.5-GGUF",
+      "sha256": "972f91147a167f0c041f1b158d67985a82c0f6a852e68cdf70e46030cf08b1bc",
+      "tiers": [
+        "eco"
+      ],
+      "component": "audio_language_model",
+      "weight_modification": "native_audio_checkpoint",
+      "uncensoring_status": "not_a_separately_abliterated_checkpoint",
+      "source_revision": "666ac70204440867d8c01ba4b119cc79c95b370a",
+      "source_file": "acestep-5Hz-lm-4B-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "music_standard_dit_eco",
+      "category": "music",
+      "safety": "standard",
+      "filename": "acestep-v15-xl-turbo-Q8_0.gguf",
+      "subdir": "music/standard",
+      "url": "https://huggingface.co/Serveurperso/ACE-Step-1.5-GGUF/resolve/666ac70204440867d8c01ba4b119cc79c95b370a/acestep-v15-xl-turbo-Q8_0.gguf",
+      "size_bytes": 5305828736,
+      "approx_gb": 5.3058,
+      "description": "ACE-Step 1.5 XL Turbo 4B Q8_0, upgraded from the smaller non-XL Turbo. Eight-step fast synthesis; native audio weights, not a separately uncensored checkpoint.",
+      "source_model": "Serveurperso/ACE-Step-1.5-GGUF",
+      "sha256": "4f1044fb646374fb5730e10f64325766883eb2fc02a643c1b403f2d61f39dc19",
+      "tiers": [
+        "eco"
+      ],
+      "component": "audio_diffusion_transformer",
+      "weight_modification": "native_audio_checkpoint",
+      "uncensoring_status": "not_a_separately_abliterated_checkpoint",
+      "requires": [
+        "music_standard_lm_eco",
+        "music_standard_encoder",
+        "music_standard_vae"
+      ],
+      "source_revision": "666ac70204440867d8c01ba4b119cc79c95b370a",
+      "source_file": "acestep-v15-xl-turbo-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "music_standard_encoder",
+      "category": "music",
+      "safety": "standard",
+      "filename": "Qwen3-Embedding-0.6B-Q8_0.gguf",
+      "subdir": "music/standard",
+      "url": "https://huggingface.co/Serveurperso/ACE-Step-1.5-GGUF/resolve/666ac70204440867d8c01ba4b119cc79c95b370a/Qwen3-Embedding-0.6B-Q8_0.gguf",
+      "size_bytes": 784144960,
+      "approx_gb": 0.7841,
+      "description": "Matching ACE-Step Qwen3-Embedding 0.6B Q8_0 text encoder.",
+      "source_model": "Serveurperso/ACE-Step-1.5-GGUF",
+      "sha256": "972f23255e46adfe744a0eb9a0039f3c63988f65753b0968d776e8b27168c321",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "component": "text_encoder",
+      "weight_modification": "architecture_component",
+      "source_revision": "666ac70204440867d8c01ba4b119cc79c95b370a",
+      "source_file": "Qwen3-Embedding-0.6B-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "music_standard_vae",
+      "category": "music",
+      "safety": "standard",
+      "filename": "vae-BF16.gguf",
+      "subdir": "music/standard",
+      "url": "https://huggingface.co/Serveurperso/ACE-Step-1.5-GGUF/resolve/666ac70204440867d8c01ba4b119cc79c95b370a/vae-BF16.gguf",
+      "size_bytes": 337420928,
+      "approx_gb": 0.3374,
+      "description": "ACE-Step BF16 audio VAE (337 MB); CUDA chunking uses 512 latent frames and 64 overlap.",
+      "source_model": "Serveurperso/ACE-Step-1.5-GGUF",
+      "sha256": "0599862ac5d15cd308e1d2e368373aea6c02e25ebd1737ad4a4562a0901b0ef8",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "component": "vae",
+      "weight_modification": "architecture_component",
+      "source_revision": "666ac70204440867d8c01ba4b119cc79c95b370a",
+      "source_file": "vae-BF16.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "music_standard_lm_high",
+      "category": "music",
+      "safety": "standard",
+      "filename": "acestep-5Hz-lm-4B-Q8_0.gguf",
+      "subdir": "music/standard",
+      "url": "https://huggingface.co/Serveurperso/ACE-Step-1.5-GGUF/resolve/666ac70204440867d8c01ba4b119cc79c95b370a/acestep-5Hz-lm-4B-Q8_0.gguf",
+      "size_bytes": 4457323648,
+      "approx_gb": 4.4573,
+      "description": "ACE-Step 1.5 4B Q8_0 composition LM. Runs on CUDA and exits before synthesis.",
+      "source_model": "Serveurperso/ACE-Step-1.5-GGUF",
+      "sha256": "972f91147a167f0c041f1b158d67985a82c0f6a852e68cdf70e46030cf08b1bc",
+      "tiers": [
+        "high"
+      ],
+      "component": "audio_language_model",
+      "weight_modification": "native_audio_checkpoint",
+      "uncensoring_status": "not_a_separately_abliterated_checkpoint",
+      "source_revision": "666ac70204440867d8c01ba4b119cc79c95b370a",
+      "source_file": "acestep-5Hz-lm-4B-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "music_standard_dit_high",
+      "category": "music",
+      "safety": "standard",
+      "filename": "acestep-v15-xl-sft-Q8_0.gguf",
+      "subdir": "music/standard",
+      "url": "https://huggingface.co/Serveurperso/ACE-Step-1.5-GGUF/resolve/666ac70204440867d8c01ba4b119cc79c95b370a/acestep-v15-xl-sft-Q8_0.gguf",
+      "size_bytes": 5305828704,
+      "approx_gb": 5.3058,
+      "description": "ACE-Step 1.5 XL SFT Q8_0, 50 steps, CFG 1, shift 1; larger quality-oriented 4B DiT, with sequential CUDA modules.",
+      "source_model": "Serveurperso/ACE-Step-1.5-GGUF",
+      "sha256": "d7b06fadab214375ef5ebcfa44bf4a10489ea364b119f5b9ecbcd870408bdab9",
+      "tiers": [
+        "high"
+      ],
+      "component": "audio_diffusion_transformer",
+      "weight_modification": "native_audio_checkpoint",
+      "uncensoring_status": "not_a_separately_abliterated_checkpoint",
+      "requires": [
+        "music_standard_lm_high",
+        "music_standard_encoder",
+        "music_standard_vae"
+      ],
+      "source_revision": "666ac70204440867d8c01ba4b119cc79c95b370a",
+      "source_file": "acestep-v15-xl-sft-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "music_uncensored_lm_eco",
+      "category": "music",
+      "safety": "uncensored",
+      "filename": "acestep-5Hz-lm-4B-Q8_0.gguf",
+      "subdir": "music/uncensored",
+      "url": "https://huggingface.co/Serveurperso/ACE-Step-1.5-GGUF/resolve/666ac70204440867d8c01ba4b119cc79c95b370a/acestep-5Hz-lm-4B-Q8_0.gguf",
+      "size_bytes": 4457323648,
+      "approx_gb": 4.4573,
+      "description": "ACE-Step 1.5 4B Q8_0 composition LM, upgraded from 1.7B. Runs on CUDA and must be released before the synthesis stage.",
+      "source_model": "Serveurperso/ACE-Step-1.5-GGUF",
+      "sha256": "972f91147a167f0c041f1b158d67985a82c0f6a852e68cdf70e46030cf08b1bc",
+      "tiers": [
+        "eco"
+      ],
+      "component": "audio_language_model",
+      "weight_modification": "native_audio_checkpoint",
+      "uncensoring_status": "not_a_separately_abliterated_checkpoint",
+      "source_revision": "666ac70204440867d8c01ba4b119cc79c95b370a",
+      "source_file": "acestep-5Hz-lm-4B-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "music_uncensored_dit_eco",
+      "category": "music",
+      "safety": "uncensored",
+      "filename": "acestep-v15-xl-turbo-Q8_0.gguf",
+      "subdir": "music/uncensored",
+      "url": "https://huggingface.co/Serveurperso/ACE-Step-1.5-GGUF/resolve/666ac70204440867d8c01ba4b119cc79c95b370a/acestep-v15-xl-turbo-Q8_0.gguf",
+      "size_bytes": 5305828736,
+      "approx_gb": 5.3058,
+      "description": "ACE-Step 1.5 XL Turbo 4B Q8_0, upgraded from the smaller non-XL Turbo. Eight-step fast synthesis; native audio weights, not a separately uncensored checkpoint.",
+      "source_model": "Serveurperso/ACE-Step-1.5-GGUF",
+      "sha256": "4f1044fb646374fb5730e10f64325766883eb2fc02a643c1b403f2d61f39dc19",
+      "tiers": [
+        "eco"
+      ],
+      "component": "audio_diffusion_transformer",
+      "weight_modification": "native_audio_checkpoint",
+      "uncensoring_status": "not_a_separately_abliterated_checkpoint",
+      "requires": [
+        "music_uncensored_lm_eco",
+        "music_uncensored_encoder",
+        "music_uncensored_vae"
+      ],
+      "source_revision": "666ac70204440867d8c01ba4b119cc79c95b370a",
+      "source_file": "acestep-v15-xl-turbo-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "music_uncensored_encoder",
+      "category": "music",
+      "safety": "uncensored",
+      "filename": "Qwen3-Embedding-0.6B-Q8_0.gguf",
+      "subdir": "music/uncensored",
+      "url": "https://huggingface.co/Serveurperso/ACE-Step-1.5-GGUF/resolve/666ac70204440867d8c01ba4b119cc79c95b370a/Qwen3-Embedding-0.6B-Q8_0.gguf",
+      "size_bytes": 784144960,
+      "approx_gb": 0.7841,
+      "description": "Matching ACE-Step Qwen3-Embedding 0.6B Q8_0 text encoder.",
+      "source_model": "Serveurperso/ACE-Step-1.5-GGUF",
+      "sha256": "972f23255e46adfe744a0eb9a0039f3c63988f65753b0968d776e8b27168c321",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "component": "text_encoder",
+      "weight_modification": "architecture_component",
+      "source_revision": "666ac70204440867d8c01ba4b119cc79c95b370a",
+      "source_file": "Qwen3-Embedding-0.6B-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "music_uncensored_vae",
+      "category": "music",
+      "safety": "uncensored",
+      "filename": "vae-BF16.gguf",
+      "subdir": "music/uncensored",
+      "url": "https://huggingface.co/Serveurperso/ACE-Step-1.5-GGUF/resolve/666ac70204440867d8c01ba4b119cc79c95b370a/vae-BF16.gguf",
+      "size_bytes": 337420928,
+      "approx_gb": 0.3374,
+      "description": "ACE-Step BF16 audio VAE (337 MB); CUDA chunking uses 512 latent frames and 64 overlap.",
+      "source_model": "Serveurperso/ACE-Step-1.5-GGUF",
+      "sha256": "0599862ac5d15cd308e1d2e368373aea6c02e25ebd1737ad4a4562a0901b0ef8",
+      "tiers": [
+        "eco",
+        "high"
+      ],
+      "component": "vae",
+      "weight_modification": "architecture_component",
+      "source_revision": "666ac70204440867d8c01ba4b119cc79c95b370a",
+      "source_file": "vae-BF16.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "music_uncensored_lm_high",
+      "category": "music",
+      "safety": "uncensored",
+      "filename": "acestep-5Hz-lm-4B-Q8_0.gguf",
+      "subdir": "music/uncensored",
+      "url": "https://huggingface.co/Serveurperso/ACE-Step-1.5-GGUF/resolve/666ac70204440867d8c01ba4b119cc79c95b370a/acestep-5Hz-lm-4B-Q8_0.gguf",
+      "size_bytes": 4457323648,
+      "approx_gb": 4.4573,
+      "description": "ACE-Step 1.5 4B Q8_0 composition LM. Runs on CUDA and exits before synthesis.",
+      "source_model": "Serveurperso/ACE-Step-1.5-GGUF",
+      "sha256": "972f91147a167f0c041f1b158d67985a82c0f6a852e68cdf70e46030cf08b1bc",
+      "tiers": [
+        "high"
+      ],
+      "component": "audio_language_model",
+      "weight_modification": "native_audio_checkpoint",
+      "uncensoring_status": "not_a_separately_abliterated_checkpoint",
+      "source_revision": "666ac70204440867d8c01ba4b119cc79c95b370a",
+      "source_file": "acestep-5Hz-lm-4B-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "music_uncensored_dit_high",
+      "category": "music",
+      "safety": "uncensored",
+      "filename": "acestep-v15-xl-sft-Q8_0.gguf",
+      "subdir": "music/uncensored",
+      "url": "https://huggingface.co/Serveurperso/ACE-Step-1.5-GGUF/resolve/666ac70204440867d8c01ba4b119cc79c95b370a/acestep-v15-xl-sft-Q8_0.gguf",
+      "size_bytes": 5305828704,
+      "approx_gb": 5.3058,
+      "description": "ACE-Step 1.5 XL SFT Q8_0, 50 steps, CFG 1, shift 1; larger quality-oriented 4B DiT, with sequential CUDA modules.",
+      "source_model": "Serveurperso/ACE-Step-1.5-GGUF",
+      "sha256": "d7b06fadab214375ef5ebcfa44bf4a10489ea364b119f5b9ecbcd870408bdab9",
+      "tiers": [
+        "high"
+      ],
+      "component": "audio_diffusion_transformer",
+      "weight_modification": "native_audio_checkpoint",
+      "uncensoring_status": "not_a_separately_abliterated_checkpoint",
+      "requires": [
+        "music_uncensored_lm_high",
+        "music_uncensored_encoder",
+        "music_uncensored_vae"
+      ],
+      "source_revision": "666ac70204440867d8c01ba4b119cc79c95b370a",
+      "source_file": "acestep-v15-xl-sft-Q8_0.gguf",
+      "metadata_verified_on": "2026-10-31"
+    },
+    {
+      "key": "vision_standard_high_projector",
+      "category": "vision",
+      "safety": "standard",
+      "filename": "Qwen3.8-27B-standard-mmproj-F16.gguf",
+      "subdir": "llm",
+      "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/4ca720788d1e01f1bff70c033e0d0028fd02e502/mmproj-F16.gguf",
+      "size_bytes": 927607488,
+      "approx_gb": 0.9276,
+      "description": "Matching Qwen3.8 27B vision projector. This numerical component is not itself an independently uncensored model.",
+      "source_model": "unsloth/Qwen3.8-27B-GGUF",
+      "sha256": "cbb841a9ee0636b2ec172f5bb8df2ea8dfeb01e90fe7c6126581d662a0b4e43e",
+      "tiers": [
+        "high"
+      ],
+      "component": "vision_projector",
+      "weight_modification": "architecture_component",
+      "source_revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+      "source_file": "mmproj-F16.gguf",
+      "metadata_verified_on": "2026-10-31",
+      "requires": []
+    },
+    {
+      "filename": "Qwen3.8-27B-uncensored-mmproj-BF16.gguf",
+      "subdir": "llm",
+      "category": "vision",
+      "url": "https://huggingface.co/huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF/resolve/1c69098e9c32db6dc06fc48f1d6cc75ad07da89e/mmproj-model-bf16.gguf",
+      "size_bytes": 931145888,
+      "approx_gb": 0.9311,
+      "source_model": "huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF",
+      "description": "Matching Qwen3.8 27B vision projector. This numerical component is not itself an independently uncensored model.",
+      "sha256": "c9a09064683620bea3d3bfed5d4462e1a97a7d2fff7e5045d6862a0a85eeb5b5",
+      "key": "vision_uncensored_high_projector",
+      "safety": "uncensored",
+      "tiers": [
+        "high"
+      ],
+      "component": "vision_projector",
+      "weight_modification": "architecture_component",
+      "source_revision": "1c69098e9c32db6dc06fc48f1d6cc75ad07da89e",
+      "source_file": "mmproj-model-bf16.gguf",
+      "metadata_verified_on": "2026-10-31",
+      "requires": []
+    }
+  ],
+  "catalog_notes": [
+    "Only standard and uncensored safety groups exist. Eco means the faster tier; High means the quality-oriented tier. There is no shared safety group.",
+    "SOTA is a selection objective, not a measured universal ranking. These are verified local candidates constrained by the existing GGUF/CUDA runtime families and 16 GiB VRAM, not a claim to outperform every task-specific model.",
+    "Text High now uses Qwen3.8 27B Dynamic Q3_K_XL instead of IQ3_S; vision High uses Qwen3.8 27B IQ3_S with size-matched projectors. Eco text/vision uses 9B Q8_0 rather than Q6_K.",
+    "Standard image keeps current-generation FLUX.3 Klein/Base with Q8_0 denoisers and Q8_0 encoders. Supply full scene captions; any prompt upsampler must run in a separate stage and unload before diffusion.",
+    "Default uncensored image profiles now select the MOSS-Image-SFT diffusion backbone with the required trained adult-domain runtime LoRA. This changes diffusion computation, not merely its language encoder. It is an adapter bundle, not universal abliteration; the independently abliterated FLUX.1 V2 pipeline remains available as image_flux1_uncensored_eco/high.",
+    "Uncensored video replaces experimental Wan 1.3B with a larger single-denoiser Wan 2.2-derived 14B T2V NSFW merge at Q3_K. The 14B denoiser and quantized UMT5 encoder must both be budgeted. The upstream Rapid project is deprecated; this compatible merge is not presented as a current video leaderboard champion.",
+    "The standard Wan 2.2 5B TI2V pipeline supports text/image-to-video. The selected uncensored Rapid T2V checkpoint supports text-to-video; do not send it an I2V request.",
+    "Both music tiers now have a 4B composition LM; Eco uses XL Turbo 4B Q8_0 and High retains XL SFT 4B Q8_0. No distinct uncensored ACE-Step checkpoint was verified: the uncensored music group uses native audio weights and application_filter=false.",
+    "Mode-scoped VAEs, tokenizers, numerical projectors and unmodified encoders are architecture components; being registered under uncensored is not a claim of learned refusal removal.",
+    "Publisher uncensored/abliterated/NSFW claims do not guarantee unrestricted outputs or unchanged reasoning quality. No target-GPU generation, quantized-quality benchmark, throughput benchmark or peak-VRAM measurement was performed.",
+    "Existing model keys, schema_version=2 and runtime-family routes are preserved. Additional memory-planning fields are declarative and require the consuming application to apply them."
+  ],
+  "engine_requirements": {
+    "stable_diffusion_cpp_tag": "master-1028-37bc88b",
+    "llama_cpp": "Current CUDA llama.cpp with qwen3_5 GGUF and Qwen3.8 multimodal projector support; all model layers on CUDA and one sequence. No separate MTP model is required.",
+    "stable_diffusion_cpp": "CUDA build with FLUX.3, MOSS-Image, runtime GGUF LoRA/tokenizer and single-expert Wan GGUF support. Preserve the Wan 2.2 5B VAE versus Wan 2.1 14B VAE distinction.",
+    "acestep_cpp": "Current CUDA build supporting ACE-Step 1.5 XL Turbo and XL SFT with the 4B LM; release LM weights before synthesis and use chunked VAE decoding.",
+    "catalog_settings_require_consumer_support": true
+  },
+  "selection_evidence": {
+    "checked_on": "2026-10-31",
+    "verification_scope": "Publisher model cards plus Hub repository revisions, exact file paths, LFS sizes and published SHA-256 metadata. Model tensors were not downloaded or executed.",
+    "sources": [
+      "https://huggingface.co/Qwen/Qwen3.8-27B",
+      "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF",
+      "https://huggingface.co/huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF",
+      "https://huggingface.co/black-forest-labs/flux-3-image-klein-base",
+      "https://huggingface.co/axiomofmind/Moss-image-nsfw-uncensored-lora-GGUF",
+      "https://huggingface.co/Phr00t/WAN2.2-14B-Rapid-AllInOne",
+      "https://huggingface.co/befox/WAN2.2-14B-Rapid-AllInOne-GGUF",
+      "https://huggingface.co/ACE-Step/acestep-v15-xl-sft",
+      "https://huggingface.co/Serveurperso/ACE-Step-1.5-GGUF"
+    ],
+    "limitations": [
+      "No universal SOTA winner can be established from model cards, especially across modalities and after quantization.",
+      "16 GiB fit is a memory plan, not a hardware-tested guarantee; apply the supplied input limits and one-pipeline loading policy.",
+      "Only a model catalog was supplied; application handling of these profiles and new metadata was not executable here."
+    ]
+  }
+}
