@@ -437,6 +437,39 @@ static bool ensure_cuda_and_build_deps(const Config& cfg, std::string& out_nvcc)
     return !out_nvcc.empty() && fs::exists(out_nvcc);
 }
 
+static fs::path ace_build_binary(const fs::path& repo, std::string_view name) {
+    const std::string filename = std::string(name) + exe_suffix();
+    fs::path selected;
+    // Keep the same precedence as the install copy loop below.
+    for (const auto& candidate : {
+             repo / "build/Release" / filename,
+             repo / "build" / filename,
+             repo / "build/bin/Release" / filename,
+             repo / "build/bin" / filename}) {
+        std::error_code ec;
+        if (fs::is_regular_file(candidate, ec)) selected = candidate;
+    }
+    return selected;
+}
+
+static bool ace_build_pair_ready(const fs::path& repo) {
+    for (const std::string_view name : {"ace-lm", "ace-synth"}) {
+        const fs::path binary = ace_build_binary(repo, name);
+        if (binary.empty()) return false;
+        std::string cmd = shell_quote(binary.string()) + " --help 2>&1";
+#ifndef _WIN32
+        const char* old_ld = std::getenv("LD_LIBRARY_PATH");
+        cmd = "LD_LIBRARY_PATH=" + shell_quote(binary.parent_path().string() +
+              (old_ld && *old_ld ? std::string(":") + old_ld : "")) + " " + cmd;
+#endif
+        const std::string help = capture_cmd(cmd);
+        if (help.find("--models") == std::string::npos ||
+            help.find("--request") == std::string::npos ||
+            help.find("--device") == std::string::npos) return false;
+    }
+    return true;
+}
+
 bool build_cpp_ai_engines(const Config& cfg, bool force_update) {
     cfg.ensure_directories();
     std::string nvcc;
@@ -603,14 +636,12 @@ bool build_cpp_ai_engines(const Config& cfg, bool force_update) {
 
     // 3. acestep.cpp
     fs::path ace_dir = fs::path(cfg.engines_dir) / "acestep.cpp";
-    fs::path ace_bin = ace_dir / "build/ace-synth";
-    if (!fs::exists(ace_bin)) ace_bin = ace_dir / "build/bin/ace-synth";
-    if (!fs::exists(ace_bin) || force_update) {
+    if (force_update || !ace_build_pair_ready(ace_dir)) {
         if (cfg.acestep_cpp_repo.empty()) {
             log_err("acestep_cpp_repo is not configured in " + cfg.sources_file);
             return false;
         }
-        log_info(std::string(force_update ? "Updating & rebuilding " : "Building ") +
+        log_info(std::string(force_update ? "Updating & rebuilding " : "Building compatible ") +
                  "acestep.cpp in " + ace_dir.string() + " ...");
         if (!fs::exists(ace_dir / ".git")) {
             std::error_code ec;
@@ -618,19 +649,35 @@ bool build_cpp_ai_engines(const Config& cfg, bool force_update) {
             if (run_cmd("git clone --depth 1 --recurse-submodules " + shell_quote(cfg.acestep_cpp_repo) + " " +
                         shell_quote(ace_dir.string())) != 0) return false;
         } else {
-            if (force_update) run_cmd("git -C " + shell_quote(ace_dir.string()) + " pull --ff-only", true);
-            run_cmd("git -C " + shell_quote(ace_dir.string()) + " submodule update --init --recursive", true);
+            // `pull` fails on the detached HEAD left by build.sh --rebuild.
+            // HEAD here names the remote's default branch, regardless of name.
+            const std::string git = "git -C " + shell_quote(ace_dir.string());
+            if (run_cmd(git + " fetch --depth 1 origin HEAD") != 0 ||
+                run_cmd(git + " checkout --detach --force FETCH_HEAD") != 0 ||
+                run_cmd(git + " submodule update --init --recursive") != 0) return false;
         }
         sanitize_thirdparty_cmake_warnings(ace_dir);
         clean_stale_cmake_cache(ace_dir / "build");
+        // Do not let stale binaries in an old output layout replace the newly
+        // built pair when the copy loop visits both build/ and build/bin/.
+        for (const auto& dir : {ace_dir / "build/Release", ace_dir / "build",
+                                ace_dir / "build/bin/Release", ace_dir / "build/bin"}) {
+            std::error_code remove_ec;
+            fs::remove(dir / (std::string("ace-lm") + exe_suffix()), remove_ec);
+            fs::remove(dir / (std::string("ace-synth") + exe_suffix()), remove_ec);
+        }
         std::string ace_cuda_opt = has_cuda ? "-DGGML_CUDA=ON" : "-DGGML_CUDA=OFF";
         std::string bcmd = "cmake -S " + shell_quote(ace_dir.string()) +
                            " -B " + shell_quote((ace_dir / "build").string()) +
-                           " -G Ninja -DCMAKE_BUILD_TYPE=Release " + ace_cuda_opt +
+                           " -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF " + ace_cuda_opt +
                            cuda_flags +
                            " && cmake --build " + shell_quote((ace_dir / "build").string()) +
                            " --config Release -j" + jobs_str;
         if (run_cmd(bcmd) != 0) return false;
+        if (!ace_build_pair_ready(ace_dir)) {
+            log_err("ACE-Step binaries must support --models, --request and --device after rebuilding.");
+            return false;
+        }
     }
     log_ok("acestep.cpp ready.");
 
@@ -640,10 +687,14 @@ bool build_cpp_ai_engines(const Config& cfg, bool force_update) {
              llama_dir / "build/bin/llama-cli",
              sd_dir / "build/bin/sd-cli",
              sd_dir / "build/bin/sd",
-             ace_dir / "build/ace-lm",
-             ace_dir / "build/bin/ace-lm",
-             ace_dir / "build/ace-synth",
-             ace_dir / "build/bin/ace-synth" }) {
+             ace_dir / "build/Release" / (std::string("ace-lm") + exe_suffix()),
+             ace_dir / "build" / (std::string("ace-lm") + exe_suffix()),
+             ace_dir / "build/bin/Release" / (std::string("ace-lm") + exe_suffix()),
+             ace_dir / "build/bin" / (std::string("ace-lm") + exe_suffix()),
+             ace_dir / "build/Release" / (std::string("ace-synth") + exe_suffix()),
+             ace_dir / "build" / (std::string("ace-synth") + exe_suffix()),
+             ace_dir / "build/bin/Release" / (std::string("ace-synth") + exe_suffix()),
+             ace_dir / "build/bin" / (std::string("ace-synth") + exe_suffix()) }) {
         if (fs::exists(src_b, ec)) {
             fs::path dst_b = fs::path(cfg.bin_dir) / src_b.filename();
             fs::copy_file(src_b, dst_b, fs::copy_options::overwrite_existing, ec);

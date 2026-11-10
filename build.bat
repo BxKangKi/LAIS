@@ -156,24 +156,37 @@ if "%LAIS_ONLY%"=="0" (
 
     set "ACE_DIR=%ENGINES_DIR%\acestep.cpp"
     set "BUILD_ACE=%FORCE_REBUILD%"
-    if not exist "!ACE_DIR!\build\Release\ace-synth.exe" if not exist "!ACE_DIR!\build\ace-synth.exe" (
-        set "BUILD_ACE=1"
-    )
+    call :ace_pair_ready "!ACE_DIR!"
+    if errorlevel 1 set "BUILD_ACE=1"
     if "!BUILD_ACE!"=="1" (
         if not exist "!ACE_DIR!\.git" (
             git clone --depth 1 --recurse-submodules "!ACE_REPO!" "!ACE_DIR!"
+            if errorlevel 1 exit /b 1
         ) else (
-            if "!FORCE_REBUILD!"=="1" (
-                git -C "!ACE_DIR!" fetch --depth 1 origin master
-                if errorlevel 1 exit /b 1
-                git -C "!ACE_DIR!" checkout --detach FETCH_HEAD
-                if errorlevel 1 exit /b 1
-            )
+            REM Fetch the remote default branch even after a detached checkout.
+            git -C "!ACE_DIR!" fetch --depth 1 origin HEAD
+            if errorlevel 1 exit /b 1
+            git -C "!ACE_DIR!" checkout --detach --force FETCH_HEAD
+            if errorlevel 1 exit /b 1
             git -C "!ACE_DIR!" submodule update --init --recursive
+            if errorlevel 1 exit /b 1
         )
         if "%HAS_CUDA%"=="1" (set "ACE_CUDA_OPT=-DGGML_CUDA=ON") else (set "ACE_CUDA_OPT=-DGGML_CUDA=OFF")
+        REM Discard stale executable layouts before linking the new pair.
+        for %%n in (ace-lm ace-synth) do (
+            for %%p in ("!ACE_DIR!\build\Release\%%n.exe" "!ACE_DIR!\build\%%n.exe" "!ACE_DIR!\build\bin\Release\%%n.exe" "!ACE_DIR!\build\bin\%%n.exe") do (
+                if exist "%%~p" del /Q "%%~p"
+            )
+        )
         cmake -S "!ACE_DIR!" -B "!ACE_DIR!\build" -DCMAKE_BUILD_TYPE=Release !ACE_CUDA_OPT! -DBUILD_SHARED_LIBS=OFF !CUDA_CMAKE_FLAGS!
+        if errorlevel 1 exit /b 1
         cmake --build "!ACE_DIR!\build" --config Release -j 8
+        if errorlevel 1 exit /b 1
+        call :ace_pair_ready "!ACE_DIR!"
+        if errorlevel 1 (
+            echo [ERROR] Rebuilt ACE-Step binaries must support --models, --request and --device.
+            exit /b 1
+        )
     )
 
     for %%f in (
@@ -185,8 +198,12 @@ if "%LAIS_ONLY%"=="0" (
         "!SD_DIR!\build\bin\sd-cli.exe"
         "!ACE_DIR!\build\Release\ace-lm.exe"
         "!ACE_DIR!\build\ace-lm.exe"
+        "!ACE_DIR!\build\bin\Release\ace-lm.exe"
+        "!ACE_DIR!\build\bin\ace-lm.exe"
         "!ACE_DIR!\build\Release\ace-synth.exe"
         "!ACE_DIR!\build\ace-synth.exe"
+        "!ACE_DIR!\build\bin\Release\ace-synth.exe"
+        "!ACE_DIR!\build\bin\ace-synth.exe"
     ) do (
         if exist "%%~f" copy /Y "%%~f" "%BIN_DIR%\" >NUL
     )
@@ -281,3 +298,31 @@ echo   * PAKE User Store : %DATA_DIR%\user.json (Initial ID/PW: admin / admin)
 echo   * Backup ZIP File : %BUILD_ZIP%
 echo ==============================================================================
 endlocal
+exit /b 0
+
+:ace_pair_ready
+setlocal EnableDelayedExpansion
+set "ACE_PROBE_LOG=%CACHE_DIR%\tmp\ace-build-help.txt"
+for %%n in (ace-lm ace-synth) do (
+    set "ACE_PROBE_BIN="
+    REM Keep the same candidate precedence as the installation loop.
+    for %%p in ("%~1\build\Release\%%n.exe" "%~1\build\%%n.exe" "%~1\build\bin\Release\%%n.exe" "%~1\build\bin\%%n.exe") do (
+        if exist "%%~p" set "ACE_PROBE_BIN=%%~p"
+    )
+    if not defined ACE_PROBE_BIN (
+        endlocal
+        exit /b 1
+    )
+    "!ACE_PROBE_BIN!" --help >"!ACE_PROBE_LOG!" 2>&1
+    for %%o in (--models --request --device) do (
+        findstr /L /C:"%%o" "!ACE_PROBE_LOG!" >NUL
+        if errorlevel 1 (
+            del /Q "!ACE_PROBE_LOG!" 2>NUL
+            endlocal
+            exit /b 1
+        )
+    )
+)
+del /Q "!ACE_PROBE_LOG!" 2>NUL
+endlocal
+exit /b 0

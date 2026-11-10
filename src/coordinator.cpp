@@ -203,6 +203,101 @@ static bool memory_allocation_failed(const fs::path& log_path) {
     return false;
 }
 
+// Engine failures are usually written to stderr. Keep a bounded excerpt in the
+// API response so the UI can show the actual cause without reading a server file.
+static std::string engine_log_tail(const fs::path& path) {
+    std::ifstream log(path, std::ios::binary | std::ios::ate);
+    if (!log) return {};
+    const auto end = log.tellg();
+    if (end <= 0) return {};
+    constexpr std::streamoff limit = 4096;
+    log.seekg(std::max(std::streamoff(0), std::streamoff(end) - limit));
+    std::ostringstream tail;
+    tail << log.rdbuf();
+    return trim_copy(tail.str());
+}
+
+static bool ace_cli_compatible(const std::string& help) {
+    return help.find("--models") != std::string::npos &&
+           help.find("--request") != std::string::npos &&
+           help.find("--device") != std::string::npos;
+}
+
+static bool ace_registry_model_missing(const fs::path& log_path,
+                                       const std::string& field, const std::string& model) {
+    const std::string log = engine_log_tail(log_path);
+    // Restrict compatibility retries to this exact selected model. A missing
+    // weight, tokenizer, CUDA library, or another model must remain an error.
+    for (const char quote : {'\'', '"'}) {
+        if (log.find(field + " " + quote + model + quote + " not found in registry") != std::string::npos)
+            return true;
+    }
+    return false;
+}
+
+static std::string ace_json_stringify(const json::Value& value) {
+    if (value.is_string()) return "\"" + json::escape(value.as_string()) + "\"";
+    if (value.is_bool()) return value.as_bool() ? "true" : "false";
+    if (value.is_number()) {
+        std::ostringstream number;
+        number << std::setprecision(17) << value.as_double();
+        return number.str();
+    }
+    if (value.is_array()) {
+        std::string result = "[";
+        for (const auto& item : std::get<json::Array>(value.v)) {
+            if (result.size() > 1) result += ",";
+            result += ace_json_stringify(item);
+        }
+        return result + "]";
+    }
+    if (value.is_object()) {
+        std::string result = "{";
+        for (const auto& [key, item] : std::get<json::Object>(value.v)) {
+            if (result.size() > 1) result += ",";
+            result += "\"" + json::escape(key) + "\":" + ace_json_stringify(item);
+        }
+        return result + "}";
+    }
+    return "null";
+}
+
+static bool ace_update_synth_model(const fs::path& request_path, const std::string& name) {
+    auto request = json::parse(read_file_bytes(request_path));
+    if (!request.is_object()) return false;
+    // Preserve generated codes, metadata, and fields added by the engine.
+    std::get<json::Object>(request.v)["synth_model"].v = name;
+    return write_file_atomic(request_path, ace_json_stringify(request) + "\n", 0600);
+}
+
+static bool ace_cuda_kernel_failed(const fs::path& log_path) {
+    const std::string log = to_lower_ascii(engine_log_tail(log_path));
+    for (const char* marker : {"flash_attn", "flash attention", "flash-attention",
+                               "cuda graph", "cudagraph", "illegal memory access",
+                               "cublas_status_execution_failed"}) {
+        if (log.find(marker) != std::string::npos) return true;
+    }
+    return false;
+}
+
+static std::string ace_failure(const std::string& stage, int rc, const fs::path& log_path,
+                               const std::string& detail = "") {
+    std::string message = "ACE-Step CUDA " + stage + " failed (exit " + std::to_string(rc) + ").";
+    if (!detail.empty()) message += " " + detail;
+    const std::string tail = engine_log_tail(log_path);
+    const std::string low = to_lower_ascii(tail);
+    if (low.find("no kernel image") != std::string::npos ||
+        low.find("invalid device function") != std::string::npos ||
+        low.find("unsupported toolchain") != std::string::npos) {
+        message += " Rebuild the CUDA engines for this GPU: bash build.sh --rebuild (Windows: build.bat --rebuild).";
+    } else if (memory_allocation_failed(log_path)) {
+        message += " Free GPU memory and retry; CPU model offload is disabled.";
+    }
+    message += " Inspect " + log_path.string();
+    if (!tail.empty()) message += "\nEngine output:\n" + tail;
+    return message;
+}
+
 static const json::Value& mode_profile(const Config& cfg, std::string_view modality, bool uncensored, std::string_view tier) {
     return cfg.generation_profile(std::string(modality) + (uncensored ? "_uncensored_" : "_standard_") + std::string(tier));
 }
@@ -1280,6 +1375,25 @@ std::string InferenceCoordinator::handle_music_generation(
     route.modality   = "music";
     route.mem_before = query_memory_stats_sync();
 
+    std::vector<fs::path> temporary_files;
+    fs::path pending_output;
+    bool keep_output = false;
+    struct MusicCleanup {
+        std::function<void()> run;
+        ~MusicCleanup() { if (run) run(); }
+    } cleanup{[&] {
+        for (const auto& file : temporary_files) {
+            std::error_code ec;
+            fs::remove(file, ec);
+        }
+        if (!keep_output && !pending_output.empty()) {
+            std::error_code ec;
+            fs::remove(pending_output, ec);
+        }
+        set_active_badge("None (Idle - 0 MB VRAM)");
+        trim_process_memory();
+    }};
+
     std::string eff_tier = tier_override.empty() || tier_override == "auto"
         ? cfg_.default_tier
         : tier_override;
@@ -1316,6 +1430,18 @@ std::string InferenceCoordinator::handle_music_generation(
         return make_error_json("acestep.cpp binaries (ace-lm / ace-synth) are not installed in " + cfg_.bin_dir +
                                ". Run 'bash build.sh' (or 'install engines' in LAIS CLI) to compile them.", route);
     }
+    // Do not assume an existing executable implements the catalog's CLI. Older
+    // ACE builds took --lm/--dit instead of the registry-based --models option.
+    // Probe each time: an engine may have been replaced at the same path.
+    const std::string lm_help = capture_cmd(shell_quote(ace_lm_bin.string()) + " --help 2>&1");
+    const std::string synth_help = capture_cmd(shell_quote(ace_synth_bin.string()) + " --help 2>&1");
+    if (!ace_cli_compatible(lm_help) || !ace_cli_compatible(synth_help)) {
+        const bool bad_lm = !ace_cli_compatible(lm_help);
+        return make_error_json("The installed ACE-Step " + std::string(bad_lm ? "ace-lm" : "ace-synth") +
+            " does not support the required --models/--request/--device CLI. "
+            "Run 'install engines' in LAIS, or bash build.sh --rebuild (Windows: build.bat --rebuild), "
+            "then restart LAIS.\nEngine output:\n" + (bad_lm ? lm_help : synth_help).substr(0, 4096), route);
+    }
     if (!fs::exists(chosen_dit) || !fs::exists(text_enc) || !fs::exists(ace_vae)) {
         return make_error_json("ACE-Step 1.5 GGUF model files are missing in " + mus_dir.string() +
                                ". Run 'setup' or 'install music' in the LAIS CLI.", route);
@@ -1323,55 +1449,140 @@ std::string InferenceCoordinator::handle_music_generation(
 
     int safe_sec = std::clamp(seconds, 15, 120);
     int64_t eff_seed = generate_random_seed();
-    std::string stamp = std::to_string(std::time(nullptr)) + "_" + std::to_string(eff_seed % 10000);
+    std::string stamp = std::to_string(std::time(nullptr)) + "_" + std::to_string(eff_seed);
     fs::path req_base = fs::path(cfg_.media_out_dir) / ("ace_req_" + stamp);
     fs::path req_json = req_base.string() + ".json";
     fs::path req_mid  = req_base.string() + "0.json";
     std::string filename = "ace_music_" + stamp + ".mp3";
     fs::path out_mp3  = fs::path(cfg_.media_out_dir) / filename;
+    pending_output = out_mp3;
+    temporary_files = {req_json, req_mid,
+        fs::path(req_base.string() + "00.mp3"), fs::path(req_base.string() + "0.mp3"),
+        fs::path(req_base.string() + "00.wav"), fs::path(req_base.string() + "0.wav"),
+        fs::path(req_base.string() + "00.vae"), fs::path(req_base.string() + "0.vae")};
 
-    std::string lm_stem  = chosen_lm.stem().string();
-    std::string dit_stem = chosen_dit.stem().string();
+    // Registry identifiers are full filenames in deployed ACE builds. Some
+    // revisions require stems instead; retry that format only on an exact
+    // registry lookup rejection, never select an arbitrary first model.
+    std::string lm_model_name = chosen_lm.filename().string();
+    const std::string dit_model_name = chosen_dit.filename().string();
     std::string lyr      = lyrics.empty() ? "[Instrumental]" : lyrics;
 
-    std::ostringstream j;
-    j << "{\n"
-      << "  \"caption\": \"" << json::escape(tags) << "\",\n"
-      << "  \"lyrics\": \"" << json::escape(lyr) << "\",\n"
-      << "  \"duration\": " << safe_sec << ",\n"
-      << "  \"seed\": " << eff_seed << ",\n"
-      << "  \"inference_steps\": " << profile.get_int("steps", 8) << ",\n"
-      << "  \"guidance_scale\": 1.0,\n"
-      << "  \"shift\": " << profile.get_int("shift", 3) << ",\n"
-      << "  \"lm_model\": \"" << json::escape(lm_stem) << "\",\n"
-      << "  \"synth_model\": \"" << json::escape(dit_stem) << "\",\n"
-      << "  \"output_format\": \"mp3\"\n"
-      << "}\n";
-    write_file_atomic(req_json, j.str(), 0600);
+    auto write_request = [&](bool reduce_lm_memory) {
+        std::ostringstream j;
+        j << "{\n"
+          << "  \"caption\": \"" << json::escape(tags) << "\",\n"
+          << "  \"lyrics\": \"" << json::escape(lyr) << "\",\n"
+          << "  \"duration\": " << safe_sec << ",\n"
+          << "  \"seed\": " << eff_seed << ",\n"
+          << "  \"lm_batch_size\": 1,\n"
+          << "  \"synth_batch_size\": 1,\n"
+          << "  \"lm_cfg_scale\": " << (reduce_lm_memory ? 1.0 : 2.0) << ",\n"
+          << "  \"inference_steps\": " << profile.get_int("steps", 8) << ",\n"
+          << "  \"guidance_scale\": 1.0,\n"
+          << "  \"shift\": " << profile.get_int("shift", 3) << ",\n"
+          << "  \"lm_model\": \"" << json::escape(lm_model_name) << "\",\n"
+          << "  \"synth_model\": \"" << json::escape(dit_model_name) << "\",\n"
+          << "  \"output_format\": \"mp3\"\n"
+          << "}\n";
+        return write_file_atomic(req_json, j.str(), 0600);
+    };
+    if (!write_request(false))
+        return make_error_json("Could not write ACE-Step request: " + req_json.string(), route);
 
     set_active_badge("Running ACE-Step 1.5 LM (" + route.selected_tier + ")");
-    std::ostringstream cmd1;
-    cmd1 << shell_quote(ace_lm_bin.string())
+    const fs::path lm_log = fs::path(cfg_.logs_dir) / "ace-lm.log";
+    const fs::path synth_log = fs::path(cfg_.logs_dir) / "ace-synth.log";
+    auto run_lm = [&](bool compatibility_retry) {
+        std::ostringstream cmd1;
+        if (compatibility_retry) {
+#ifdef _WIN32
+            cmd1 << "set \"GGML_CUDA_DISABLE_GRAPHS=1\" && ";
+#else
+            cmd1 << "GGML_CUDA_DISABLE_GRAPHS=1 ";
+#endif
+        }
+        cmd1 << shell_quote(ace_lm_bin.string())
          << " --device CUDA0"
          << " --models "  << shell_quote(mus_dir.string())
-         << " --request " << shell_quote(req_json.string())
-         << " >"          << shell_quote(cfg_.logs_dir + "/ace-lm.log") << " 2>&1";
-    if (run_cmd(cmd1.str(), true) != 0 || !fs::exists(req_mid)) {
-        return make_error_json("ACE-Step CUDA LM failed. Inspect " + cfg_.logs_dir + "/ace-lm.log", route);
+         << " --request " << shell_quote(req_json.string());
+        if (compatibility_retry) {
+            if (lm_help.find("--no-fa") != std::string::npos) cmd1 << " --no-fa";
+            if (lm_help.find("--no-batch-cfg") != std::string::npos) cmd1 << " --no-batch-cfg";
+        }
+        cmd1 << " >" << shell_quote(lm_log.string()) << " 2>&1";
+        // quiet=true adds another stderr redirect and would discard CUDA errors.
+        return run_cmd(cmd1.str());
+    };
+    int lm_rc = run_lm(false);
+    if (lm_rc != 0 && ace_registry_model_missing(lm_log, "lm_model", lm_model_name)) {
+        std::error_code ec;
+        fs::copy_file(lm_log, fs::path(cfg_.logs_dir) / "ace-lm-registry-attempt.log",
+                      fs::copy_options::overwrite_existing, ec);
+        fs::remove(req_mid, ec);
+        lm_model_name = chosen_lm.stem().string();
+        log_warn("ACE-Step LM registry rejected the filename; trying the same selected model without .gguf once.");
+        if (!write_request(false))
+            return make_error_json("Could not write ACE-Step model-name retry request: " + req_json.string(), route);
+        lm_rc = run_lm(false);
+        route.reason += " Retried registry lookup with the selected LM's stem.";
     }
+    if (lm_rc != 0 && !ace_registry_model_missing(lm_log, "lm_model", lm_model_name) &&
+        (memory_allocation_failed(lm_log) || ace_cuda_kernel_failed(lm_log))) {
+        const bool reduce_lm_memory = memory_allocation_failed(lm_log);
+        log_warn("ACE-Step LM failed; retrying once on CUDA with compatibility settings.");
+        std::error_code ec;
+        fs::copy_file(lm_log, fs::path(cfg_.logs_dir) / "ace-lm-first-attempt.log",
+                      fs::copy_options::overwrite_existing, ec);
+        fs::remove(req_mid, ec);
+        purge_dram_and_pagecache(cfg_.models_dir);
+        if (!write_request(reduce_lm_memory))
+            return make_error_json("Could not write ACE-Step retry request: " + req_json.string(), route);
+        lm_rc = run_lm(true);
+        route.reason += " Retried LM on CUDA with graphs/flash attention disabled where supported.";
+        if (reduce_lm_memory) route.reason += " LM CFG was reduced to 1 to lower KV-cache memory.";
+    }
+    if (lm_rc != 0) return make_error_json(ace_failure("LM", lm_rc, lm_log), route);
+    const auto lm_result = json::parse(read_file_bytes(req_mid));
+    if (!lm_result.is_object() || trim_copy(lm_result.get_string("audio_codes")).empty())
+        return make_error_json(ace_failure("LM", lm_rc, lm_log,
+            "The LM did not produce a valid request with audio_codes: " + req_mid.string()), route);
     purge_dram_and_pagecache(cfg_.models_dir);
 
     set_active_badge("Running ACE-Step 1.5 DiT Synth (" + route.selected_tier + ")");
-    fs::path synth_in = fs::exists(req_mid) ? req_mid : req_json;
+    fs::path synth_in = req_mid;
     std::ostringstream cmd2;
     cmd2 << shell_quote(ace_synth_bin.string())
          << " --device CUDA0 --vae-chunk 512 --vae-overlap 64"
          << " --models "  << shell_quote(mus_dir.string())
          << " --request " << shell_quote(synth_in.string())
-         << " >"          << shell_quote(cfg_.logs_dir + "/ace-synth.log") << " 2>&1";
-    int rc = run_cmd(cmd2.str(), true);
+         << " >"          << shell_quote(synth_log.string()) << " 2>&1";
+    int rc = run_cmd(cmd2.str());
+    if (rc != 0 && ace_registry_model_missing(synth_log, "synth_model", dit_model_name)) {
+        std::error_code ec;
+        fs::copy_file(synth_log, fs::path(cfg_.logs_dir) / "ace-synth-registry-attempt.log",
+                      fs::copy_options::overwrite_existing, ec);
+        if (!ace_update_synth_model(req_mid, chosen_dit.stem().string()))
+            return make_error_json("Could not update the ACE-Step synthesis model name in " + req_mid.string(), route);
+        log_warn("ACE-Step synthesis registry rejected the filename; trying the same selected model without .gguf once.");
+        rc = run_cmd(cmd2.str());
+        route.reason += " Retried registry lookup with the selected DiT's stem.";
+    }
     set_active_badge("None (Idle - 0 MB VRAM)");
     purge_dram_and_pagecache(cfg_.models_dir);
+
+    // A failed process can leave partial audio. Handle its error before trying
+    // to convert or publish that file, so conversion cannot hide a CUDA error.
+    if (rc != 0) {
+        if (use_high && memory_allocation_failed(synth_log)) {
+            log_warn("Music quality tier exceeded VRAM; retrying Eco on CUDA.");
+            cleanup.run();
+            cleanup.run = {};
+            lk.unlock();
+            return handle_music_generation(tags, lyrics, seconds, "eco", uncensored, chat_id, attached_name);
+        }
+        return make_error_json(ace_failure("music synthesis", rc, synth_log), route);
+    }
 
     std::vector<fs::path> candidates = {
         fs::path(req_base.string() + "00.mp3"),
@@ -1381,17 +1592,18 @@ std::string InferenceCoordinator::handle_music_generation(
         out_mp3
     };
     for (const auto& cand : candidates) {
-        if (fs::exists(cand)) {
+        std::error_code file_ec;
+        if (fs::is_regular_file(cand, file_ec) && fs::file_size(cand, file_ec) > 0 && !file_ec) {
             if (cand.extension() == ".wav") {
                 std::string ff = "ffmpeg -y -i " + shell_quote(cand.string()) +
                                  " -codec:a libmp3lame -qscale:a 2 " +
                                  shell_quote(out_mp3.string()) + " >/dev/null 2>&1";
-                run_cmd(ff, true);
-                std::error_code ec;
-                fs::remove(cand, ec);
+                if (run_cmd(ff) != 0)
+                    return make_error_json("ACE-Step WAV to MP3 conversion failed. Check that ffmpeg is installed.", route);
             } else if (cand != out_mp3) {
                 std::error_code ec;
                 fs::rename(cand, out_mp3, ec);
+                if (ec) return make_error_json("Could not save generated music: " + ec.message(), route);
             }
             break;
         }
@@ -1406,14 +1618,11 @@ std::string InferenceCoordinator::handle_music_generation(
         cached_stats_ = mem_after;
     }
 
-    if (rc != 0 && use_high && memory_allocation_failed(fs::path(cfg_.logs_dir) / "ace-synth.log")) {
-        log_warn("Music quality tier exceeded VRAM; retrying Eco on CUDA.");
-        lk.unlock();
-        return handle_music_generation(tags, lyrics, seconds, "eco", uncensored, chat_id, attached_name);
-    }
-    if (rc != 0 || !fs::exists(out_mp3)) {
-        return make_error_json("ACE-Step music synthesis failed (exit " + std::to_string(rc) +
-                               "). Inspect " + cfg_.logs_dir + "/ace-synth.log", route);
+    if (!fs::exists(out_mp3) || fs::file_size(out_mp3) == 0) {
+        std::error_code remove_ec;
+        fs::remove(out_mp3, remove_ec);
+        return make_error_json(ace_failure("music synthesis", rc, synth_log,
+            "The synthesizer did not produce a nonempty audio file."), route);
     }
 
     std::string media_url = "/media/" + filename;
@@ -1423,6 +1632,7 @@ std::string InferenceCoordinator::handle_music_generation(
         cfg_, chat_id, tags, attached_name, md, "",
         route.selected_tier, route.model_name, route.reason,
         media_url, download_url, "audio");
+    keep_output = true;
     return make_media_json(md, media_url, download_url, filename, "audio", saved_chat_id, route, mem_after);
 }
 

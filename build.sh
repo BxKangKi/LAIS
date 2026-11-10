@@ -311,6 +311,22 @@ ensure_llama_cpp_min_build() {
 HW_THREADS="$(nproc 2>/dev/null || echo 4)"
 BUILD_JOBS=$(( HW_THREADS > 8 ? 8 : HW_THREADS ))
 
+# Old ACE binaries use --lm/--dit instead of the model registry. Existence alone
+# does not mean that a previously installed pair can run this application's CLI.
+ace_pair_ready() {
+    local repo="$1" name binary candidate help
+    for name in ace-lm ace-synth; do
+        binary=""
+        # Match the overwrite order used when installing binaries below.
+        for candidate in "${repo}/build/${name}" "${repo}/build/bin/${name}"; do
+            [ ! -x "${candidate}" ] || binary="${candidate}"
+        done
+        [ -n "${binary}" ] || return 1
+        help="$(LD_LIBRARY_PATH="$(dirname "${binary}"):${LD_LIBRARY_PATH:-}" "${binary}" --help 2>&1 || true)"
+        [[ "${help}" == *"--models"* && "${help}" == *"--request"* && "${help}" == *"--device"* ]] || return 1
+    done
+}
+
 if [ "${LAIS_ONLY}" -eq 0 ]; then
     echo -e "\033[1;34m[3/5]\033[0m Building C++ AI Inference Engines in ${ENGINES_DIR} (Jobs: ${BUILD_JOBS})..."
 
@@ -385,25 +401,33 @@ if [ "${LAIS_ONLY}" -eq 0 ]; then
 
     ACE_DIR="${ENGINES_DIR}/acestep.cpp"
     restore_clean_cmake "${ACE_DIR}"
-    if { [ ! -x "${ACE_DIR}/build/ace-synth" ] && [ ! -x "${ACE_DIR}/build/bin/ace-synth" ]; } || [ "${FORCE_REBUILD}" -eq 1 ]; then
+    if [ "${FORCE_REBUILD}" -eq 1 ] || ! ace_pair_ready "${ACE_DIR}"; then
         echo -e "\033[1;34m  ->\033[0m Building acestep.cpp..."
         if [ ! -d "${ACE_DIR}/.git" ]; then
             rm -rf "${ACE_DIR}"
             git clone --depth 1 --recurse-submodules "${ACE_REPO}" "${ACE_DIR}"
         else
-            if [ "${FORCE_REBUILD}" -eq 1 ]; then
-                git -C "${ACE_DIR}" fetch --depth 1 origin master
-                git -C "${ACE_DIR}" checkout --detach FETCH_HEAD
-            fi
+            # Fetch the remote's default branch even when an earlier rebuild
+            # left this managed checkout at a detached HEAD.
+            git -C "${ACE_DIR}" fetch --depth 1 origin HEAD
+            git -C "${ACE_DIR}" checkout --detach --force FETCH_HEAD
             git -C "${ACE_DIR}" submodule update --init --recursive
         fi
         restore_clean_cmake "${ACE_DIR}"
         rm -rf "${ACE_DIR}/build/CMakeCache.txt" "${ACE_DIR}/build/CMakeFiles"
+        # Remove outputs from older layouts so a stale build/bin binary cannot
+        # overwrite the newly linked build/ executable during installation.
+        rm -f "${ACE_DIR}/build/ace-lm" "${ACE_DIR}/build/ace-synth" \
+              "${ACE_DIR}/build/bin/ace-lm" "${ACE_DIR}/build/bin/ace-synth"
         ACE_CUDA_OPT="$( [ "${HAS_CUDA}" -eq 1 ] && echo "-DGGML_CUDA=ON" || echo "-DGGML_CUDA=OFF" )"
         # shellcheck disable=SC2086
         cmake -S "${ACE_DIR}" -B "${ACE_DIR}/build" -G Ninja -DCMAKE_BUILD_TYPE=Release \
             ${ACE_CUDA_OPT} -DBUILD_SHARED_LIBS=OFF ${CUDA_CMAKE_FLAGS}
         cmake --build "${ACE_DIR}/build" --config Release -j"${BUILD_JOBS}"
+        if ! ace_pair_ready "${ACE_DIR}"; then
+            echo "[ERROR] ACE-Step binaries do not support --models, --request and --device after rebuilding." >&2
+            exit 1
+        fi
     else
         echo -e "\033[1;32m  ->\033[0m Reusing already-built acestep.cpp"
     fi

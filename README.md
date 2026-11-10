@@ -111,6 +111,42 @@ and the Windows process-job path require validation on the target machine.
 
 ## Build and install
 
+### ACE-Step CUDA LM recovery
+
+If the log lists `acestep-5Hz-lm-4B-Q8_0.gguf -> LM` but rejects
+`lm_model 'acestep-5Hz-lm-4B-Q8_0'`, rebuild only the application with
+`bash build.sh --lais-only` from this project directory, then restart LAIS
+(`./build/lais restart`). On Windows use `build.bat --lais-only` instead.
+This update sends the complete `.gguf` filename for both LM and DiT selection.
+Only an exact registry lookup rejection retries the same selected model's stem
+once, independently for each stage. It never sends an empty/default model name,
+so installed 1.7B/Turbo models cannot silently replace the selected 4B/XL-SFT.
+Synthesis name retries preserve the LM-generated audio codes and metadata.
+
+For incompatible engine CLI options or unsupported GPU kernels, use
+`bash build.sh --rebuild` (Windows: `build.bat --rebuild`) to rebuild the CUDA
+engines for the local GPU, then restart LAIS.
+
+Both ACE executables are checked for the required `--models`, `--request` and
+`--device` options before reuse. Existing incompatible or missing executables
+are updated and rebuilt by the normal builder or `install engines`. Engine
+updates also work when a previous build left the checkout at a detached HEAD.
+
+Music failures now include the exit code and the last 4 KiB of the engine log.
+Both stdout and stderr are preserved in `~/lais/logs/ace-lm.log` and
+`ace-synth.log`. On an LM allocation or recognized CUDA kernel failure, LAIS
+retries once on CUDA with graphs disabled and supported compatibility options.
+An allocation retry also sets LM CFG to 1 to reduce KV-cache memory; this can
+change the generated audio codes. The first failure is kept in
+`ace-lm-first-attempt.log`. No retry changes to CPU inference.
+
+Invalid intermediate requests and empty audio are rejected. Failure and Stop
+clean up request files and reset the active-engine indicator. GPU-free
+regressions: `python3 tests/run_music_generation.py` (Linux, Python 3, g++).
+Actual CUDA inference and Windows execution require testing on that machine.
+
+### Installation commands
+
 Rebuild the application and CUDA engines for this catalog. Windows requires a
 Visual Studio x64 developer environment; Linux/WSL requires a C++20 toolchain,
 CMake, Ninja, Git, curl and CUDA. The build scripts may install missing dependencies.
